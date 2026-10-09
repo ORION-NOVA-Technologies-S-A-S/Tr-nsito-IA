@@ -971,6 +971,18 @@ sb.auth.onAuthStateChange((event, session) => {
   if (session) enterApp(); else leaveApp();
 });
 showAuth('welcome');
+// Enlace de correo vencido o ya usado (#error=...&error_code=otp_expired)
+if (/error_code=|error=/.test(location.hash)) {
+  const h = new URLSearchParams(location.hash.slice(1));
+  history.replaceState(null, '', location.pathname);
+  setTimeout(() => {
+    if (S.session) return;
+    showAuth('login');
+    msg($('#f-msg'), h.get('error_code') === 'otp_expired'
+      ? 'Ese enlace ya se usó o venció. Si ya confirmaste tu correo, inicia sesión aquí con tu correo y contraseña.'
+      : 'No se pudo completar el enlace del correo. Inicia sesión o pide un enlace nuevo.');
+  }, 300);
+}
 })();
 </script>
 </body>
