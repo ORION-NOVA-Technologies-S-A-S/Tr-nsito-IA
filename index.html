@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
 <style>
 /* Layout: app shell — mapa a pantalla completa con pestañas abajo (móvil); panel lateral + mapa (escritorio) */
@@ -390,7 +390,7 @@ button{cursor:pointer;border:0;background:none;padding:0}
 <div id="modal-root"></div>
 <div id="toast" role="status" hidden></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function () {
@@ -412,6 +412,10 @@ const TYPES = [
 ];
 const T = Object.fromEntries(TYPES.map(t => [t.key, t]));
 
+if (!window.supabase || !window.L) {
+  document.body.innerHTML = '<div style="padding:32px 20px;font-family:system-ui;text-align:center;color:#0B1B4D"><h2>No se pudo cargar Alerta Tránsito</h2><p>Revisa tu conexión a internet y recarga la página.</p><button onclick="location.reload()" style="margin-top:12px;padding:12px 20px;border-radius:10px;border:0;background:#1E5EFF;color:#fff;font-weight:700">Recargar</button></div>';
+  return;
+}
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
 });
