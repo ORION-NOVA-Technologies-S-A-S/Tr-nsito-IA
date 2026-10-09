@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alerta Tránsito</title>
+<meta name="description" content="Reporta y evita fotomultas, retenes, controles y accidentes en tiempo real. Una comunidad de Orion Nova Technologies.">
+<meta name="theme-color" content="#03050C">
+<link rel="icon" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<style>
+/* Layout: app shell — mapa a pantalla completa con pestañas abajo (móvil); panel lateral + mapa (escritorio) */
+:root{
+  --primary:#1E5EFF; --primary-dark:#1747C7; --primary-soft:#EAF0FF;
+  --navy:#0B1B4D; --night:#03050C; --cyan:#38BDF8;
+  --text:#111827; --muted:#64748B; --border:#E3E8F2; --bg:#F4F6FB; --card:#FFFFFF;
+  --danger:#E53935; --ok:#16A34A;
+  --font:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --shadow:0 4px 16px rgba(11,27,77,.12);
+  --radius:14px;
+  --nav-h:64px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:var(--font);color:var(--text);background:var(--bg);font-size:15px;-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.mdi{line-height:1}
+
+/* ---------- Bienvenida / login ---------- */
+#auth{position:fixed;inset:0;z-index:2000;overflow-y:auto;background:var(--bg)}
+.welcome{min-height:100%;display:flex;flex-direction:column;justify-content:space-between;gap:24px;
+  padding:calc(24px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));
+  background:radial-gradient(120% 70% at 50% 20%,#0c1d5c 0%,#06103A 45%,var(--night) 100%);color:#fff}
+.welcome-inner{width:100%;max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:24px;flex:1;justify-content:space-between}
+.welcome .logo{width:min(78%,340px);margin:0 auto;display:block}
+.welcome h1{font-size:clamp(34px,9vw,44px);font-weight:800;text-align:center;margin:8px 0 6px;letter-spacing:-.5px;text-wrap:balance}
+.welcome h1 span{color:var(--cyan)}
+.welcome p.lead{text-align:center;color:#CBD5E1;margin:0;font-size:16px;line-height:1.45}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.feature i{display:inline-flex;width:56px;height:56px;border-radius:50%;align-items:center;justify-content:center;font-size:28px;border:2px solid rgba(255,255,255,.85);color:#fff}
+.feature span{display:block;font-size:13px;margin-top:6px;line-height:1.3}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:12px;background:var(--primary);color:#fff;font-weight:700;font-size:16px;width:100%;transition:background .15s,opacity .15s}
+.btn:hover{background:var(--primary-dark)}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.ghost{background:transparent;border:1.5px solid rgba(255,255,255,.85)}
+.btn.ghost:hover{background:rgba(255,255,255,.08)}
+.btn.outline{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
+.btn.outline:hover{background:var(--primary-soft)}
+.btn.danger{background:var(--danger)}
+.stack{display:flex;flex-direction:column;gap:12px}
+
+.form-page{max-width:440px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top,0px)) 20px 40px}
+.back{display:inline-flex;align-items:center;gap:4px;color:var(--text);font-weight:600;margin-bottom:14px;font-size:15px}
+.back i{font-size:24px}
+.form-page h2{font-size:28px;font-weight:800;margin:22px 0 4px;letter-spacing:-.3px}
+.form-page .sub{color:var(--muted);margin:0 0 20px}
+.field{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:0 12px;height:50px}
+.field:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.field i{color:var(--muted);font-size:20px}
+.field input{flex:1;min-width:0;border:0;outline:0;background:transparent;height:100%;font-size:15px}
+.field .icon-btn{color:var(--muted);font-size:20px;display:flex}
+.check{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:13px;line-height:1.4;margin-top:4px;cursor:pointer}
+.check input{width:18px;height:18px;margin-top:1px;accent-color:var(--primary);flex:none}
+.link{color:var(--primary);font-weight:700;text-decoration:none}
+.center{text-align:center}
+.form-error{background:#FDECEC;color:#9B1C1C;border-radius:10px;padding:10px 12px;font-size:14px}
+.form-ok{background:#E8F7EE;color:#14532D;border-radius:10px;padding:10px 12px;font-size:14px}
+
+/* ---------- Marca ---------- */
+.brand{display:flex;align-items:center;gap:8px}
+.brand img{width:36px;height:36px;border-radius:9px}
+.brand b{display:block;font-size:15px;font-weight:800;color:var(--navy);letter-spacing:1.2px;line-height:1.1}
+.brand small{display:block;font-size:8px;font-weight:700;color:var(--primary);letter-spacing:3px}
+
+/* ---------- Shell ---------- */
+#app{position:fixed;inset:0;display:grid;grid-template-columns:1fr;grid-template-rows:1fr var(--nav-h);grid-template-areas:"main" "nav"}
+#mapwrap{grid-area:main;position:relative;min-height:0}
+#map{position:absolute;inset:0;background:#e9eef5}
+#panel{grid-area:main;z-index:1000;background:var(--bg);overflow-y:auto;min-height:0}
+#nav{grid-area:nav;z-index:1100;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
+#app{grid-template-rows:1fr calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
+#nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;position:relative}
+#nav button i{font-size:25px}
+#nav button[aria-current="page"]{color:var(--primary)}
+#nav .badge{position:absolute;top:8px;left:calc(50% + 6px);background:var(--danger);color:#fff;font-size:10px;font-weight:800;border-radius:9px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+.map-top{position:absolute;top:0;left:0;right:0;z-index:900;background:#fff;box-shadow:var(--shadow);padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px}
+.map-top .row{display:flex;justify-content:space-between;align-items:center}
+.round{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--navy);background:#fff}
+.search{margin-top:10px;display:flex;align-items:center;gap:8px;height:46px;padding:0 12px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
+.search i{font-size:22px;color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:15px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-top:10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;align-items:center;gap:6px;height:36px;padding:0 12px 0 8px;border-radius:18px;border:1px solid var(--border);background:#fff;font-size:13px;font-weight:700;color:var(--navy);white-space:nowrap}
+.chip.all{padding:0 14px}
+.chip[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:#fff}
+.ticon{display:inline-flex;align-items:center;justify-content:center;color:#fff;flex:none;border-radius:50%}
+.ticon.sq{border-radius:28%}
+
+.map-ctrl{position:absolute;right:14px;bottom:28px;z-index:900;display:flex;flex-direction:column;gap:10px}
+.ctrl{width:46px;height:46px;border-radius:12px;background:#fff;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--navy)}
+.zoom{background:#fff;border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+.zoom button{width:46px;height:46px;font-size:24px;color:var(--navy);display:flex;align-items:center;justify-content:center}
+.zoom button+button{border-top:1px solid var(--border)}
+.sel-card{position:absolute;left:16px;right:76px;bottom:28px;z-index:900;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;padding:12px;text-align:left;max-width:420px}
+.sel-card .t{font-weight:800}
+.sel-card .s{font-size:13px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sel-card .m{font-size:12px;color:var(--muted)}
+.pick-banner{position:absolute;left:50%;transform:translateX(-50%);bottom:28px;z-index:900;background:var(--navy);color:#fff;border-radius:12px;padding:10px 14px;display:flex;gap:10px;align-items:center;box-shadow:var(--shadow);font-weight:600;font-size:14px;width:max-content;max-width:calc(100% - 32px)}
+.pick-banner button{color:var(--cyan);font-weight:800}
+.empty-badge{position:absolute;left:16px;right:76px;bottom:28px;z-index:900;background:rgba(255,255,255,.95);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);font-size:13px;font-weight:600;color:var(--navy);max-width:420px}
+
+/* Marcadores */
+.pin{position:relative;width:42px;height:50px}
+.pin .ring{position:absolute;left:0;top:0;width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(11,27,77,.3);display:flex;align-items:center;justify-content:center}
+.pin .tip{position:absolute;left:14px;top:39px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid}
+.pin.new .ring{animation:pop .5s ease-out}
+@keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.me-dot{width:18px;height:18px;border-radius:50%;background:var(--primary);border:3px solid #fff;box-shadow:0 0 0 6px rgba(30,94,255,.25)}
+.pick-pin{font-size:44px;color:var(--danger);text-shadow:0 2px 4px rgba(0,0,0,.3);transform:translateY(-4px)}
+
+/* ---------- Panel ---------- */
+.panel-head{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--border);padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.panel-head h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.2px}
+.panel-body{padding:14px 12px 28px}
+.grid6{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:#fff;border-radius:var(--radius);border:2px solid transparent;box-shadow:var(--shadow);aspect-ratio:1/0.92;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;font-size:12.5px;font-weight:700;text-align:center;line-height:1.2}
+.tile[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft)}
+.card{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:14px;margin-top:14px}
+.card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.card-head h3{margin:0;font-size:18px;font-weight:800}
+.card-head p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.minirow{display:flex;gap:16px;flex-wrap:wrap;padding:10px 2px}
+.minibtn{display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-weight:700;font-size:14px}
+.minibtn i{font-size:18px}
+.point-note{font-size:12.5px;color:var(--ok);font-weight:600;margin:-4px 2px 10px;display:flex;gap:6px;align-items:center}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;padding:22px 4px 8px}
+.sec-head h3{margin:0;font-size:16px;font-weight:800}
+.list{background:#fff;border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.item{display:flex;align-items:center;gap:12px;padding:12px 14px;width:100%;text-align:left;border-bottom:1px solid var(--border)}
+.item:last-child{border-bottom:0}
+.item:hover{background:#FAFBFE}
+.item .info{flex:1;min-width:0}
+.item .t{font-weight:800;font-size:15px}
+.item .s{font-size:13px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .m{font-size:12px;color:var(--muted);margin-top:1px}
+.stat{display:inline-flex;align-items:center;gap:3px;color:var(--muted);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat i{font-size:18px}
+.stat.on{color:var(--primary)}
+.vote{padding:6px;border-radius:8px}
+.vote:hover{background:var(--primary-soft)}
+.empty{text-align:center;color:var(--muted);padding:30px 16px}
+.empty i{font-size:42px;color:#CBD5E1;display:block;margin-bottom:6px}
+.seg{display:flex;gap:8px;margin-top:4px}
+.seg button{height:34px;padding:0 14px;border-radius:17px;border:1px solid var(--border);font-weight:700;font-size:13px;color:var(--navy);background:#fff}
+.seg button[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:#fff}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(22,163,74,.2)}
+
+.profile-card{text-align:center;padding:22px 14px}
+.avatar{width:72px;height:72px;border-radius:50%;background:var(--primary);color:#fff;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.profile-card h3{margin:0;font-size:20px;font-weight:800}
+.profile-card p{margin:2px 0 0;color:var(--muted)}
+.stats{display:flex;justify-content:center;gap:36px;margin-top:14px}
+.stats b{display:block;font-size:22px;color:var(--primary);font-variant-numeric:tabular-nums}
+.stats span{font-size:12px;color:var(--muted)}
+.menu{background:#fff;border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.menu a,.menu button{display:flex;align-items:center;gap:12px;padding:15px 16px;width:100%;text-align:left;border-bottom:1px solid var(--border);font-weight:600;color:var(--text);text-decoration:none}
+.menu > :last-child{border-bottom:0}
+.menu i{font-size:22px;color:var(--navy)}
+.menu .chev{margin-left:auto;color:var(--muted)}
+.menu .red,.menu .red i{color:var(--danger)}
+.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+
+/* ---------- Detalle (hoja) ---------- */
+.sheet-bg{position:fixed;inset:0;z-index:1500;background:rgba(3,5,12,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:520px;max-height:88%;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.sheet-top{background:#fff;padding:16px;border-bottom:1px solid var(--border)}
+.sheet-scroll{overflow-y:auto;flex:1;min-height:0}
+.sheet .grab{width:42px;height:5px;border-radius:3px;background:#D5DBE7;margin:-6px auto 10px}
+.sheet h3{margin:0;font-size:20px;font-weight:800}
+.line{display:flex;gap:8px;margin-top:12px;align-items:flex-start}
+.line i{font-size:19px;color:var(--primary)}
+.line span{flex:1;min-width:0;overflow-wrap:anywhere}
+.comment{background:#fff;border-radius:12px;padding:10px 12px;margin:0 12px 8px}
+.comment b{color:var(--navy);font-size:14px}
+.comment p{margin:2px 0 0;overflow-wrap:anywhere}
+.comment small{color:var(--muted);font-size:11px}
+.compose{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid var(--border)}
+.compose input{flex:1;min-width:0;height:44px;border-radius:22px;background:var(--bg);border:1px solid var(--border);padding:0 16px;outline:0}
+.compose input:focus{border-color:var(--primary)}
+.compose button{width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;flex:none}
+.dialog{background:#fff;border-radius:18px;padding:20px;max-width:380px;width:calc(100% - 32px);margin:auto;align-self:center;box-shadow:var(--shadow)}
+.dialog h3{margin:0 0 6px;font-size:18px}
+.dialog p{margin:0 0 16px;color:var(--muted);line-height:1.45}
+.dialog .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dialog .btn{height:46px;font-size:15px}
+
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + 16px + env(safe-area-inset-bottom,0px));z-index:3000;background:var(--navy);color:#fff;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);font-weight:600;font-size:14px;max-width:calc(100% - 32px);width:max-content}
+.spin{width:22px;height:22px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+.spin.dark{border-color:rgba(30,94,255,.2);border-top-color:var(--primary)}
+@keyframes sp{to{transform:rotate(360deg)}}
+.leaflet-control-attribution{font-size:10px}
+.leaflet-container{font-family:var(--font)}
+
+/* ---------- Escritorio ---------- */
+@media (min-width:900px){
+  #app{grid-template-columns:420px 1fr;grid-template-rows:auto 1fr;grid-template-areas:"nav main" "panel main"}
+  #panel{grid-area:panel;border-right:1px solid var(--border);display:block!important}
+  #nav{grid-template-columns:repeat(3,1fr);height:auto;padding:0;border-top:0;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+  #nav button{flex-direction:row;gap:6px;height:52px;font-size:14px}
+  #nav button i{font-size:21px}
+  #nav button[data-tab="mapa"]{display:none}
+  #nav button[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--primary)}
+  #nav .badge{top:6px;left:auto;right:18px}
+  .map-top{left:16px;right:auto;top:16px;width:min(560px,calc(100% - 32px));border-radius:16px;padding:12px 14px}
+  .map-top .brand{display:none}
+  .map-top .row{display:none}
+  .search{margin-top:0}
+  .panel-head .hide-desk{display:none}
+  .sheet-bg{align-items:center}
+  .sheet{border-radius:20px;max-height:84%}
+  .sheet .grab{display:none}
+  #toast{bottom:24px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ Autenticación ============ -->
+<div id="auth">
+  <section id="v-welcome" class="welcome">
+    <div class="welcome-inner">
+      <div>
+        <img class="logo" src="img/logo-full.png" alt="Orion Nova Technologies">
+        <h1>Alerta <span>Tránsito</span></h1>
+        <p class="lead">Una comunidad que te mantiene informado en tiempo real</p>
+      </div>
+      <div class="features">
+        <div class="feature"><i class="mdi mdi-shield-check" style="background:#16A34A"></i><span>Evita<br>multas</span></div>
+        <div class="feature"><i class="mdi mdi-car" style="background:#E53935"></i><span>Conduce<br>más seguro</span></div>
+        <div class="feature"><i class="mdi mdi-account-group" style="background:#1E5EFF"></i><span>Información<br>de la comunidad</span></div>
+      </div>
+      <div class="stack">
+        <button class="btn" data-go="login">Iniciar sesión</button>
+        <button class="btn ghost" data-go="register">Crear cuenta</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-form" class="form-page" hidden>
+    <button class="back" data-go="welcome"><i class="mdi mdi-arrow-left"></i>Volver</button>
+    <div class="brand"><img src="img/icon-96.png" alt=""><div><b>ORION NOVA</b><small>TECHNOLOGIES</small></div></div>
+    <h2 id="f-title">Iniciar sesión</h2>
+    <p class="sub" id="f-sub">Bienvenido de nuevo a Alerta Tránsito</p>
+    <form id="auth-form" class="stack" novalidate>
+      <div id="f-msg" hidden></div>
+      <div class="field reg-only"><i class="mdi mdi-account-outline"></i><input id="f-name" placeholder="Nombre completo" autocomplete="name" maxlength="80"></div>
+      <div class="field reg-only"><i class="mdi mdi-phone-outline"></i><input id="f-phone" placeholder="Celular (opcional)" type="tel" autocomplete="tel" maxlength="20"></div>
+      <div class="field"><i class="mdi mdi-email-outline"></i><input id="f-email" placeholder="Correo electrónico" type="email" autocomplete="email" required></div>
+      <div class="field"><i class="mdi mdi-lock-outline"></i><input id="f-pass" placeholder="Contraseña" type="password" autocomplete="current-password" required minlength="6">
+        <button type="button" class="icon-btn" id="f-eye" aria-label="Mostrar contraseña"><i class="mdi mdi-eye-outline"></i></button></div>
+      <label class="check reg-only"><input type="checkbox" id="f-accept"><span>Acepto la <a class="link" href="privacidad.html" target="_blank" rel="noopener">política de privacidad</a> y el tratamiento de mis datos (Ley 1581 de 2012).</span></label>
+      <button class="btn" type="submit" id="f-submit">Iniciar sesión</button>
+      <p class="center login-only" style="margin:4px 0 0"><button type="button" class="link" id="f-forgot">¿Olvidaste tu contraseña?</button></p>
+      <p class="center" style="margin:4px 0 0;color:var(--muted)"><span id="f-switch-text">¿No tienes cuenta?</span> <button type="button" class="link" id="f-switch">Crear cuenta</button></p>
+    </form>
+  </section>
+
+  <section id="v-reset" class="form-page" hidden>
+    <div class="brand"><img src="img/icon-96.png" alt=""><div><b>ORION NOVA</b><small>TECHNOLOGIES</small></div></div>
+    <h2>Nueva contraseña</h2>
+    <p class="sub">Escribe la contraseña que quieres usar desde ahora.</p>
+    <form id="reset-form" class="stack" novalidate>
+      <div id="r-msg" hidden></div>
+      <div class="field"><i class="mdi mdi-lock-outline"></i><input id="r-pass" type="password" placeholder="Nueva contraseña (mínimo 6)" autocomplete="new-password"></div>
+      <button class="btn" type="submit">Guardar contraseña</button>
+    </form>
+  </section>
+</div>
+
+<!-- ============ App ============ -->
+<div id="app" hidden>
+  <nav id="nav" aria-label="Secciones">
+    <button data-tab="mapa" aria-current="page"><i class="mdi mdi-map-marker"></i>Mapa</button>
+    <button data-tab="reportar"><i class="mdi mdi-plus-circle-outline"></i>Reportar</button>
+    <button data-tab="alertas"><i class="mdi mdi-bell-outline"></i>Notificaciones<span class="badge" id="badge" hidden></span></button>
+    <button data-tab="perfil"><i class="mdi mdi-account-outline"></i>Perfil</button>
+  </nav>
+
+  <main id="mapwrap">
+    <div id="map" aria-label="Mapa de reportes"></div>
+    <div class="map-top">
+      <div class="row">
+        <div class="brand"><img src="img/icon-96.png" alt=""><div><b>ORION NOVA</b><small>TECHNOLOGIES</small></div></div>
+        <button class="round" id="btn-me-top" aria-label="Ir a mi ubicación"><i class="mdi mdi-crosshairs-gps"></i></button>
+      </div>
+      <form class="search" id="search-form" role="search">
+        <i class="mdi mdi-magnify"></i>
+        <input id="search" placeholder="Buscar dirección, lugar o ciudad..." autocomplete="off" enterkeyhint="search">
+        <span id="search-spin" class="spin dark" hidden></span>
+      </form>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="map-ctrl">
+      <button class="ctrl" id="btn-me" aria-label="Mi ubicación"><i class="mdi mdi-crosshairs-gps"></i></button>
+      <div class="zoom"><button id="z-in" aria-label="Acercar"><i class="mdi mdi-plus"></i></button><button id="z-out" aria-label="Alejar"><i class="mdi mdi-minus"></i></button></div>
+    </div>
+    <button class="sel-card" id="sel-card" hidden></button>
+    <div class="empty-badge" id="empty-badge" hidden></div>
+    <div class="pick-banner" id="pick-banner" hidden><i class="mdi mdi-gesture-tap" style="font-size:20px"></i>Toca el mapa donde está la alerta <button id="pick-cancel">Cancelar</button></div>
+  </main>
+
+  <aside id="panel" hidden>
+    <!-- Reportar -->
+    <section id="t-reportar" hidden>
+      <div class="panel-head"><h2>Reportar alerta de tránsito</h2><div class="brand hide-desk"><img src="img/icon-96.png" alt="" style="width:30px;height:30px"></div></div>
+      <div class="panel-body">
+        <div class="grid6" id="types"></div>
+        <form class="card" id="report-form" novalidate>
+          <div class="card-head"><span id="sel-icon"></span><div><h3 id="sel-label">Foto multas</h3><p>Coloca la dirección exacta donde se encuentra</p></div></div>
+          <div class="field"><i class="mdi mdi-map-marker-outline"></i><input id="r-address" placeholder="Ej: Av. El Dorado con Carrera 30" maxlength="200">
+            <button type="button" class="icon-btn" id="r-clear" aria-label="Borrar dirección"><i class="mdi mdi-close-circle"></i></button></div>
+          <div class="minirow">
+            <button type="button" class="minibtn" id="r-gps"><i class="mdi mdi-crosshairs-gps"></i>Usar mi ubicación</button>
+            <button type="button" class="minibtn" id="r-pick"><i class="mdi mdi-map-marker-radius-outline"></i>Marcar en el mapa</button>
+          </div>
+          <div class="point-note" id="r-point" hidden><i class="mdi mdi-check-circle"></i><span>Punto marcado en el mapa</span></div>
+          <div class="field"><i class="mdi mdi-note-text-outline"></i><input id="r-ref" placeholder="Agregar referencia (opcional)" maxlength="200"></div>
+          <button class="btn" type="submit" id="r-submit" style="margin-top:14px">Publicar ubicación</button>
+        </form>
+        <div class="sec-head"><h3>Reportes recientes</h3><button class="link" data-tab-go="alertas">Ver todos</button></div>
+        <div class="list" id="recent"></div>
+      </div>
+    </section>
+
+    <!-- Alertas -->
+    <section id="t-alertas" hidden>
+      <div class="panel-head" style="flex-direction:column;align-items:stretch;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h2>Alertas</h2><span class="live">En vivo · últimas 3 h</span></div>
+        <div class="seg" id="seg">
+          <button data-seg="cerca" aria-pressed="true">Cerca de mí (5 km)</button>
+          <button data-seg="todas" aria-pressed="false">Todas</button>
+        </div>
+      </div>
+      <div class="panel-body"><div class="list" id="alerts"></div></div>
+    </section>
+
+    <!-- Perfil -->
+    <section id="t-perfil" hidden>
+      <div class="panel-head"><div class="brand"><img src="img/icon-96.png" alt=""><div><b>ORION NOVA</b><small>TECHNOLOGIES</small></div></div></div>
+      <div class="panel-body">
+        <div class="card profile-card" style="margin-top:0">
+          <div class="avatar" id="p-avatar">?</div>
+          <h3 id="p-name">Mi perfil</h3>
+          <p id="p-email"></p>
+          <div class="stats"><div><b id="p-reports">0</b><span>Reportes</span></div><div><b id="p-votes">0</b><span>Confirmaciones</span></div></div>
+        </div>
+        <div class="sec-head"><h3>Mis datos</h3></div>
+        <form class="stack" id="profile-form" novalidate>
+          <div class="field"><i class="mdi mdi-account-outline"></i><input id="p-in-name" placeholder="Nombre completo" maxlength="80"></div>
+          <div class="field"><i class="mdi mdi-phone-outline"></i><input id="p-in-phone" placeholder="Celular (opcional)" type="tel" maxlength="20"></div>
+          <button class="btn" type="submit">Guardar cambios</button>
+        </form>
+        <div class="sec-head"><h3>Cuenta</h3></div>
+        <div class="menu">
+          <a href="privacidad.html" target="_blank" rel="noopener"><i class="mdi mdi-shield-lock-outline"></i>Política de privacidad<i class="mdi mdi-chevron-right chev"></i></a>
+          <button id="btn-logout"><i class="mdi mdi-logout"></i>Cerrar sesión<i class="mdi mdi-chevron-right chev"></i></button>
+          <button id="btn-delete" class="red"><i class="mdi mdi-account-remove-outline"></i>Eliminar mi cuenta<i class="mdi mdi-chevron-right chev"></i></button>
+        </div>
+        <p class="foot">Alerta Tránsito · Orion Nova Technologies<br>Mapa © colaboradores de OpenStreetMap</p>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast" role="status" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function () {
+'use strict';
+
+// ===== Configuración: proyecto Supabase "Alerta Transito" (separado de Nova) =====
+const SUPABASE_URL = 'https://hgwzuhizruwsdbditsai.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnd3p1aGl6cnV3c2RiZGl0c2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTM2NTIsImV4cCI6MjEwNzEyOTY1Mn0.QDPKrTzyT1zXkse821iror6YfEv74yqGeh1z3C-pklU'; // clave pública (anon); la seguridad la dan las políticas RLS
+const DEFAULT_CENTER = [4.6533, -74.0836]; // Bogotá
+const NEAR_KM = 5;
+
+const TYPES = [
+  { key: 'agente',         label: 'Agente de tránsito', chip: 'Agente',         icon: 'police-badge',   color: '#1E5EFF' },
+  { key: 'accidente',      label: 'Accidente',          chip: 'Accidente',      icon: 'alert',          color: '#E53935' },
+  { key: 'control',        label: 'Control de tránsito',chip: 'Control',        icon: 'traffic-cone',   color: '#FB8C00' },
+  { key: 'foto_multa',     label: 'Foto multas',        chip: 'Foto multas',    icon: 'camera',         color: '#8E24AA' },
+  { key: 'reten_transito', label: 'Retén de tránsito',  chip: 'Retén tránsito', icon: 'boom-gate',      color: '#F4511E' },
+  { key: 'reten_policia',  label: 'Retén de policía',   chip: 'Retén policía',  icon: 'shield-account', color: '#1A237E' },
+];
+const T = Object.fromEntries(TYPES.map(t => [t.key, t]));
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+});
+
+const S = {
+  session: null, reports: [], filter: 'todos', me: null, tab: 'mapa', type: 'foto_multa',
+  seg: 'cerca', selected: null, picking: false, point: null, autoAddress: '', seen: new Set(), unseen: 0,
+  loadedOnce: false, channel: null, detailId: null,
+};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const isDesk = () => matchMedia('(min-width:900px)').matches;
+
+// ---------- utilidades ----------
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function timeAgo(d) {
+  const s = Math.max(0, (Date.now() - new Date(d).getTime()) / 1000);
+  if (s < 60) return 'Hace un momento';
+  const m = Math.floor(s / 60);
+  if (m < 60) return `Hace ${m} minuto${m === 1 ? '' : 's'}`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `Hace ${h} hora${h === 1 ? '' : 's'}`;
+  const dd = Math.floor(h / 24);
+  return `Hace ${dd} día${dd === 1 ? '' : 's'}`;
+}
+function km(a, b) {
+  if (!a || !b) return null;
+  const R = 6371, r = x => x * Math.PI / 180;
+  const dLat = r(b[0] - a[0]), dLng = r(b[1] - a[1]);
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(r(a[0])) * Math.cos(r(b[0])) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+function fmtKm(k) { return k == null ? '' : k < 1 ? `${Math.round(k * 1000)} m` : `${k.toFixed(1)} km`; }
+function ticon(type, size, sq) {
+  const t = T[type] || T.agente;
+  return `<span class="ticon${sq ? ' sq' : ''}" style="width:${size}px;height:${size}px;background:${t.color};font-size:${Math.round(size * 0.55)}px"><i class="mdi mdi-${t.icon}"></i></span>`;
+}
+function friendly(e) {
+  const m = (e && (e.message || e.error_description)) || String(e || '');
+  if (/Invalid login credentials/i.test(m)) return 'Correo o contraseña incorrectos.';
+  if (/Email not confirmed/i.test(m)) return 'Primero confirma tu correo: abre el enlace que te enviamos.';
+  if (/already registered/i.test(m)) return 'Ya existe una cuenta con ese correo. Inicia sesión.';
+  if (/Password should be at least/i.test(m)) return 'La contraseña debe tener al menos 6 caracteres.';
+  if (/rate limit|too many/i.test(m)) return 'Demasiados intentos. Espera un minuto e inténtalo otra vez.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Sin conexión a internet. Revisa tu red.';
+  if (/could not find the function|delete_my_account/i.test(m)) return 'La eliminación automática aún no está activa. Escríbenos y la hacemos por ti.';
+  return m || 'Ocurrió un error inesperado.';
+}
+let toastTimer;
+function toast(msg) {
+  const el = $('#toast');
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, 3200);
+}
+function busy(btn, on, label) {
+  if (on) { btn.dataset.label = btn.innerHTML; btn.innerHTML = '<span class="spin"></span>'; btn.disabled = true; }
+  else { btn.innerHTML = label || btn.dataset.label || btn.innerHTML; btn.disabled = false; }
+}
+function msg(el, text, ok) {
+  if (!text) { el.hidden = true; return; }
+  el.className = ok ? 'form-ok' : 'form-error'; el.textContent = text; el.hidden = false;
+}
+function confirmBox({ title, text, ok = 'Aceptar', danger }) {
+  return new Promise(res => {
+    const root = $('#modal-root');
+    root.innerHTML = `<div class="sheet-bg" style="align-items:center"><div class="dialog" role="dialog" aria-modal="true">
+      <h3>${esc(title)}</h3><p>${esc(text)}</p>
+      <div class="row2"><button class="btn outline" data-r="0">Cancelar</button><button class="btn ${danger ? 'danger' : ''}" data-r="1">${esc(ok)}</button></div></div></div>`;
+    const done = v => { root.innerHTML = ''; res(v); };
+    root.querySelector('.sheet-bg').addEventListener('click', e => {
+      if (e.target.dataset.r) done(e.target.dataset.r === '1');
+      else if (e.target.classList.contains('sheet-bg')) done(false);
+    });
+  });
+}
+
+// ---------- geocodificación (OpenStreetMap / Nominatim) ----------
+async function geocode(q) {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=co&accept-language=es&q=${encodeURIComponent(q)}`;
+  const r = await fetch(url); const j = await r.json();
+  return j && j[0] ? [parseFloat(j[0].lat), parseFloat(j[0].lon)] : null;
+}
+async function reverse(ll) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1&accept-language=es&lat=${ll[0]}&lon=${ll[1]}`;
+    const j = await (await fetch(url)).json();
+    const a = j.address || {};
+    const street = [a.road, a.house_number ? '# ' + a.house_number : ''].filter(Boolean).join(' ');
+    const area = a.suburb || a.neighbourhood || a.city_district || a.city || a.town || '';
+    return [street || (j.name || ''), area].filter(Boolean).join(', ') || (j.display_name || '').split(',').slice(0, 2).join(',');
+  } catch (e) { return ''; }
+}
+function locate() {
+  return new Promise(res => {
+    if (!navigator.geolocation) return res(null);
+    navigator.geolocation.getCurrentPosition(
+      p => { S.me = [p.coords.latitude, p.coords.longitude]; drawMe(); res(S.me); },
+      () => res(null),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  });
+}
+
+// ---------- mapa ----------
+let map, layer, meMarker, pickMarker;
+const markers = new Map();
+function initMap() {
+  map = L.map('map', { zoomControl: false, attributionControl: true }).setView(DEFAULT_CENTER, 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
+  }).addTo(map);
+  layer = L.layerGroup().addTo(map);
+  map.on('click', e => {
+    if (S.picking) return setPoint([e.latlng.lat, e.latlng.lng]);
+    select(null);
+  });
+}
+function drawMe() {
+  if (!map || !S.me) return;
+  const icon = L.divIcon({ className: '', html: '<div class="me-dot"></div>', iconSize: [18, 18], iconAnchor: [9, 9] });
+  if (meMarker) meMarker.setLatLng(S.me); else meMarker = L.marker(S.me, { icon, interactive: false, keyboard: false }).addTo(map);
+}
+function pinIcon(r, isNew) {
+  const t = T[r.type] || T.agente;
+  return L.divIcon({
+    className: '',
+    html: `<div class="pin${isNew ? ' new' : ''}"><div class="ring">${ticon(r.type, 34)}</div><div class="tip" style="border-top-color:${t.color}"></div></div>`,
+    iconSize: [42, 50], iconAnchor: [21, 50],
+  });
+}
+function drawMarkers() {
+  if (!map) return;
+  const visible = S.filter === 'todos' ? S.reports : S.reports.filter(r => r.type === S.filter);
+  const keep = new Set(visible.map(r => r.id));
+  for (const [id, m] of markers) if (!keep.has(id)) { layer.removeLayer(m); markers.delete(id); }
+  for (const r of visible) {
+    if (markers.has(r.id)) continue;
+    const isNew = S.loadedOnce && !S.seen.has(r.id);
+    const m = L.marker([r.lat, r.lng], { icon: pinIcon(r, isNew), title: (T[r.type] || {}).label, riseOnHover: true });
+    m.on('click', ev => { L.DomEvent.stopPropagation(ev); select(r.id); });
+    m.addTo(layer); markers.set(r.id, m);
+  }
+  const eb = $('#empty-badge');
+  eb.hidden = !(S.loadedOnce && visible.length === 0) || !!S.selected || S.picking;
+  eb.textContent = `No hay reportes activos ${S.filter !== 'todos' ? 'de este tipo ' : ''}en las últimas 3 horas. ¡Sé el primero en reportar!`;
+}
+function select(id) {
+  S.selected = id;
+  const r = id && S.reports.find(x => x.id === id);
+  const c = $('#sel-card');
+  if (!r) { c.hidden = true; drawMarkers(); return; }
+  const t = T[r.type];
+  c.innerHTML = `${ticon(r.type, 42, true)}<span style="flex:1;min-width:0"><span class="t" style="display:block">${esc(t.label)}</span>
+    <span class="s" style="display:block">${esc(r.address)}</span><span class="m">${timeAgo(r.created_at)} · <i class="mdi mdi-thumb-up-outline"></i> ${r.votes}</span></span>
+    <i class="mdi mdi-chevron-right" style="font-size:26px;color:var(--muted)"></i>`;
+  c.onclick = () => openDetail(r.id);
+  c.hidden = false;
+  $('#empty-badge').hidden = true;
+}
+function flyTo(ll, z = 16) { map && map.flyTo(ll, z, { duration: 0.6 }); }
+
+// ---------- datos ----------
+let reloadTimer;
+async function loadReports() {
+  const { data, error } = await sb.from('reports_feed').select('*').order('created_at', { ascending: false }).limit(300);
+  if (error) { console.warn(error); return; }
+  const before = S.seen;
+  const fresh = (data || []).filter(r => !before.has(r.id));
+  if (S.loadedOnce && fresh.length && S.tab !== 'alertas') {
+    const others = fresh.filter(r => r.user_id !== S.session.user.id);
+    if (others.length) {
+      S.unseen += others.length;
+      const r = others[0];
+      toast(`Nueva alerta: ${T[r.type].label} · ${r.address}`);
+    }
+  }
+  S.reports = data || [];
+  drawMarkers();
+  S.seen = new Set(S.reports.map(r => r.id));
+  S.loadedOnce = true;
+  if (S.selected && !S.reports.find(r => r.id === S.selected)) select(null); else if (S.selected) select(S.selected);
+  renderLists();
+  renderBadge();
+  if (S.detailId) refreshDetail();
+}
+function scheduleReload() { clearTimeout(reloadTimer); reloadTimer = setTimeout(loadReports, 350); }
+function subscribe() {
+  if (S.channel) sb.removeChannel(S.channel);
+  S.channel = sb.channel('reportes-web')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, scheduleReload)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'report_votes' }, scheduleReload)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'report_comments' }, scheduleReload)
+    .subscribe();
+}
+async function toggleVote(r) {
+  const me = S.session.user.id;
+  const q = r.voted_by_me
+    ? sb.from('report_votes').delete().eq('report_id', r.id).eq('user_id', me)
+    : sb.from('report_votes').insert({ report_id: r.id });
+  // respuesta inmediata en pantalla
+  r.voted_by_me = !r.voted_by_me; r.votes += r.voted_by_me ? 1 : -1; renderLists();
+  const { error } = await q;
+  if (error) toast(friendly(error));
+  loadReports();
+}
+
+// ---------- listas ----------
+function itemHTML(r, dist) {
+  const t = T[r.type];
+  return `<div class="item" data-open="${r.id}" role="button" tabindex="0">${ticon(r.type, 46)}
+    <div class="info"><div class="t">${esc(t.label)}</div><div class="s">${esc(r.address)}</div>
+    <div class="m">${timeAgo(r.created_at)}${dist ? ' · ' + dist : ''}</div></div>
+    <button class="stat vote ${r.voted_by_me ? 'on' : ''}" data-vote="${r.id}" aria-label="Confirmar que sigue ahí"><i class="mdi mdi-thumb-up${r.voted_by_me ? '' : '-outline'}"></i>${r.votes}</button>
+    <span class="stat"><i class="mdi mdi-comment-outline"></i>${r.comments}</span></div>`;
+}
+function renderLists() {
+  const recent = S.reports.slice(0, 5);
+  $('#recent').innerHTML = recent.length ? recent.map(r => itemHTML(r)).join('')
+    : `<div class="empty"><i class="mdi mdi-map-marker-plus-outline"></i>Aún no hay reportes. ¡Sé el primero en reportar!</div>`;
+  let list = S.reports.map(r => ({ r, k: km(S.me, [r.lat, r.lng]) }));
+  if (S.seg === 'cerca') list = S.me ? list.filter(x => x.k != null && x.k <= NEAR_KM) : [];
+  $('#alerts').innerHTML = list.length ? list.map(x => itemHTML(x.r, fmtKm(x.k))).join('')
+    : `<div class="empty"><i class="mdi mdi-bell-check-outline"></i>${S.seg === 'cerca' && !S.me
+      ? 'Activa tu ubicación para ver las alertas cerca de ti.<br><button class="link" id="ask-loc" style="margin-top:8px">Activar ubicación</button>'
+      : 'No hay alertas por ahora. ¡Buen viaje!'}</div>`;
+}
+function renderBadge() {
+  const b = $('#badge');
+  b.hidden = !S.unseen; b.textContent = S.unseen > 9 ? '9+' : S.unseen;
+}
+document.addEventListener('click', e => {
+  const v = e.target.closest('[data-vote]');
+  if (v) { e.stopPropagation(); const r = S.reports.find(x => x.id === v.dataset.vote); if (r) toggleVote(r); return; }
+  const o = e.target.closest('[data-open]');
+  if (o) { openDetail(o.dataset.open); return; }
+  if (e.target.id === 'ask-loc') { locate().then(renderLists); }
+});
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-open]')) { e.preventDefault(); openDetail(e.target.dataset.open); }
+  if (e.key === 'Escape' && $('#modal-root').innerHTML) closeDetail();
+});
+
+// ---------- detalle ----------
+async function openDetail(id) {
+  S.detailId = id;
+  const r = S.reports.find(x => x.id === id);
+  if (r && map) { flyTo([r.lat, r.lng], 16); }
+  $('#modal-root').innerHTML = `<div class="sheet-bg" id="sheet-bg"><div class="sheet" role="dialog" aria-modal="true" aria-label="Detalle del reporte">
+    <div class="sheet-scroll" id="sheet-scroll"><div class="empty"><span class="spin dark" style="display:inline-block"></span></div></div>
+    <form class="compose" id="compose"><input id="c-text" placeholder="Escribe un comentario..." maxlength="300" aria-label="Comentario"><button aria-label="Enviar"><i class="mdi mdi-send"></i></button></form>
+  </div></div>`;
+  $('#sheet-bg').addEventListener('click', e => { if (e.target.id === 'sheet-bg') closeDetail(); });
+  $('#compose').addEventListener('submit', async e => {
+    e.preventDefault();
+    const body = $('#c-text').value.trim(); if (!body) return;
+    const btn = e.target.querySelector('button'); busy(btn, true);
+    const { error } = await sb.from('report_comments').insert({ report_id: id, body });
+    busy(btn, false, '<i class="mdi mdi-send"></i>');
+    if (error) return toast(friendly(error));
+    $('#c-text').value = ''; refreshDetail(); loadReports();
+  });
+  refreshDetail();
+}
+function closeDetail() { S.detailId = null; $('#modal-root').innerHTML = ''; }
+async function refreshDetail() {
+  const id = S.detailId; if (!id) return;
+  const [{ data: r }, { data: cs }] = await Promise.all([
+    sb.from('reports_feed').select('*').eq('id', id).maybeSingle(),
+    sb.from('report_comments').select('id, body, created_at, user_id').eq('report_id', id).order('created_at', { ascending: true }),
+  ]);
+  if (S.detailId !== id) return;
+  const box = $('#sheet-scroll'); if (!box) return;
+  if (!r) { box.innerHTML = `<div class="sheet-top"><div class="grab"></div><div class="empty"><i class="mdi mdi-clock-alert-outline"></i>Este reporte ya venció o fue eliminado.</div></div>`; $('#compose').hidden = true; return; }
+  const list = cs || [];
+  const ids = [...new Set(list.map(c => c.user_id))];
+  let names = {};
+  if (ids.length) {
+    const { data: p } = await sb.from('profiles').select('id, full_name').in('id', ids);
+    names = Object.fromEntries((p || []).map(x => [x.id, x.full_name]));
+  }
+  const t = T[r.type], mine = r.user_id === S.session.user.id;
+  box.innerHTML = `<div class="sheet-top"><div class="grab"></div>
+      <div style="display:flex;align-items:center;gap:12px">${ticon(r.type, 52, true)}
+        <div style="flex:1;min-width:0"><h3>${esc(t.label)}</h3><div style="color:var(--muted)">${timeAgo(r.created_at)}</div></div>
+        ${mine ? '<button class="round" id="d-del" aria-label="Eliminar reporte" style="color:var(--danger)"><i class="mdi mdi-trash-can-outline"></i></button>' : ''}
+        <button class="round" id="d-close" aria-label="Cerrar"><i class="mdi mdi-close"></i></button></div>
+      <div class="line"><i class="mdi mdi-map-marker"></i><span>${esc(r.address)}</span></div>
+      ${r.reference ? `<div class="line"><i class="mdi mdi-note-text-outline" style="color:var(--muted)"></i><span>${esc(r.reference)}</span></div>` : ''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+        <button class="btn ${r.voted_by_me ? '' : 'outline'}" id="d-vote" style="height:46px;font-size:15px"><i class="mdi mdi-thumb-up${r.voted_by_me ? '' : '-outline'}"></i>${r.voted_by_me ? 'Confirmado' : 'Sigue ahí'} · ${r.votes}</button>
+        <a class="btn outline" style="height:46px;font-size:15px;text-decoration:none" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"><i class="mdi mdi-directions"></i>Cómo llegar</a>
+      </div></div>
+    <div style="font-weight:800;padding:16px 16px 8px">Comentarios (${list.length})</div>
+    ${list.length ? list.map(c => `<div class="comment"><b>${esc(names[c.user_id] || 'Usuario')}</b><p>${esc(c.body)}</p><small>${timeAgo(c.created_at)}</small></div>`).join('')
+      : '<p style="color:var(--muted);padding:0 16px 16px;margin:0">Sé el primero en comentar.</p>'}
+    <div style="height:8px"></div>`;
+  $('#d-close').onclick = closeDetail;
+  $('#d-vote').onclick = async () => { await toggleVote(r); refreshDetail(); };
+  if (mine) $('#d-del').onclick = async () => {
+    const ok = await confirmBox({ title: 'Eliminar reporte', text: '¿Seguro que quieres eliminar este reporte?', ok: 'Eliminar', danger: true });
+    if (!ok) return openDetail(id);
+    const { error } = await sb.from('reports').delete().eq('id', id);
+    if (error) return toast(friendly(error));
+    S.detailId = null; toast('Reporte eliminado'); loadReports();
+  };
+}
+
+// ---------- pestañas ----------
+function setTab(tab) {
+  if (isDesk() && tab === 'mapa') tab = S.tab === 'mapa' ? 'reportar' : S.tab;
+  S.tab = tab;
+  $$('#nav button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
+  ['reportar', 'alertas', 'perfil'].forEach(k => { $('#t-' + k).hidden = k !== tab; });
+  $('#panel').hidden = !isDesk() && tab === 'mapa';
+  if (tab === 'alertas') { S.unseen = 0; renderBadge(); }
+  if (tab === 'perfil') loadProfile();
+  if (tab === 'mapa' && map) setTimeout(() => map.invalidateSize(), 50);
+  $('#panel').scrollTop = 0;
+}
+$('#nav').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) setTab(b.dataset.tab); });
+document.addEventListener('click', e => { const g = e.target.closest('[data-tab-go]'); if (g) setTab(g.dataset.tabGo); });
+matchMedia('(min-width:900px)').addEventListener('change', () => { setTab(S.tab); map && map.invalidateSize(); });
+
+// ---------- chips y tipos ----------
+function renderChips() {
+  $('#chips').innerHTML = `<button class="chip all" data-f="todos" aria-pressed="${S.filter === 'todos'}">Todos</button>` +
+    TYPES.map(t => `<button class="chip" data-f="${t.key}" aria-pressed="${S.filter === t.key}">${ticon(t.key, 22, true)}${esc(t.chip)}</button>`).join('');
+}
+$('#chips').addEventListener('click', e => {
+  const b = e.target.closest('[data-f]'); if (!b) return;
+  S.filter = b.dataset.f; select(null); renderChips(); drawMarkers();
+  if (!isDesk()) setTab('mapa');
+});
+function renderTypes() {
+  $('#types').innerHTML = TYPES.map(t => `<button type="button" class="tile" data-type="${t.key}" aria-pressed="${S.type === t.key}">${ticon(t.key, 46)}<span>${esc(t.label)}</span></button>`).join('');
+  $('#sel-icon').innerHTML = ticon(S.type, 48, true);
+  $('#sel-label').textContent = T[S.type].label;
+}
+$('#types').addEventListener('click', e => { const b = e.target.closest('[data-type]'); if (b) { S.type = b.dataset.type; renderTypes(); } });
+
+// ---------- reportar ----------
+async function fillFromGPS() {
+  const btn = $('#r-gps'); const old = btn.innerHTML;
+  btn.innerHTML = '<span class="spin dark" style="width:16px;height:16px;border-width:2px"></span>Buscando...';
+  const ll = await locate();
+  btn.innerHTML = old;
+  if (!ll) return toast('Activa el permiso de ubicación en tu navegador.');
+  setPoint(ll, true);
+}
+async function setPoint(ll, fromGps) {
+  S.point = ll;
+  if (pickMarker) pickMarker.setLatLng(ll);
+  else pickMarker = L.marker(ll, { icon: L.divIcon({ className: '', html: '<i class="mdi mdi-map-marker pick-pin"></i>', iconSize: [44, 44], iconAnchor: [22, 44] }) }).addTo(map);
+  $('#r-point').hidden = false;
+  $('#r-point span').textContent = fromGps ? 'Usando tu ubicación actual' : 'Punto marcado en el mapa';
+  if (S.picking) { stopPick(); if (!isDesk()) setTab('reportar'); }
+  const addr = await reverse(ll);
+  if (addr) { S.autoAddress = addr; $('#r-address').value = addr; }
+}
+function startPick() {
+  S.picking = true; select(null);
+  $('#pick-banner').hidden = false; $('#empty-badge').hidden = true;
+  if (!isDesk()) setTab('mapa');
+  map.getContainer().style.cursor = 'crosshair';
+}
+function stopPick() { S.picking = false; $('#pick-banner').hidden = true; map.getContainer().style.cursor = ''; drawMarkers(); }
+function clearPoint() { S.point = null; S.autoAddress = ''; $('#r-point').hidden = true; if (pickMarker) { map.removeLayer(pickMarker); pickMarker = null; } }
+$('#r-gps').onclick = fillFromGPS;
+$('#r-pick').onclick = startPick;
+$('#pick-cancel').onclick = () => { stopPick(); if (!isDesk()) setTab('reportar'); };
+$('#r-clear').onclick = () => { $('#r-address').value = ''; clearPoint(); $('#r-address').focus(); };
+$('#r-address').addEventListener('input', () => { if ($('#r-address').value.trim() !== S.autoAddress && S.point && S.autoAddress) clearPoint(); });
+$('#report-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const address = $('#r-address').value.trim();
+  if (address.length < 3) { $('#r-address').focus(); return toast('Escribe la dirección donde se encuentra.'); }
+  const btn = $('#r-submit'); busy(btn, true);
+  try {
+    let ll = S.point;
+    if (!ll) ll = await geocode(address);
+    if (!ll) ll = S.me || await locate();
+    if (!ll) throw new Error('No encontramos esa dirección. Escríbela más completa (con ciudad) o márcala en el mapa.');
+    const { error } = await sb.from('reports').insert({
+      type: S.type, address, reference: $('#r-ref').value.trim() || null, lat: ll[0], lng: ll[1],
+    });
+    if (error) throw error;
+    $('#r-ref').value = ''; $('#r-address').value = ''; clearPoint();
+    toast(`¡Gracias! Tu reporte de ${T[S.type].label.toLowerCase()} ya está en el mapa.`);
+    await loadReports();
+    flyTo(ll, 16);
+    if (!isDesk()) setTab('mapa');
+  } catch (err) { toast(friendly(err)); }
+  finally { busy(btn, false); }
+});
+
+// ---------- buscador y controles ----------
+$('#search-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const q = $('#search').value.trim(); if (!q) return;
+  $('#search').blur(); $('#search-spin').hidden = false;
+  try { const ll = await geocode(q); ll ? flyTo(ll, 16) : toast('No encontramos ese lugar.'); }
+  catch (err) { toast(friendly(err)); }
+  $('#search-spin').hidden = true;
+});
+async function goMe() { const ll = S.me || await locate(); ll ? flyTo(ll, 16) : toast('Activa el permiso de ubicación en tu navegador.'); }
+$('#btn-me').onclick = goMe; $('#btn-me-top').onclick = goMe;
+$('#z-in').onclick = () => map.zoomIn(); $('#z-out').onclick = () => map.zoomOut();
+$$('#seg button').forEach(b => b.onclick = () => {
+  S.seg = b.dataset.seg; $$('#seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  if (S.seg === 'cerca' && !S.me) locate().then(renderLists); else renderLists();
+});
+
+// ---------- perfil ----------
+async function loadProfile() {
+  const u = S.session.user;
+  $('#p-email').textContent = u.email;
+  const [{ data: p }, r, v] = await Promise.all([
+    sb.from('profiles').select('full_name, phone').eq('id', u.id).maybeSingle(),
+    sb.from('reports').select('id', { count: 'exact', head: true }).eq('user_id', u.id),
+    sb.from('report_votes').select('report_id', { count: 'exact', head: true }).eq('user_id', u.id),
+  ]);
+  const name = (p && p.full_name) || '';
+  $('#p-name').textContent = name || 'Mi perfil';
+  $('#p-avatar').textContent = (name || u.email || '?').charAt(0).toUpperCase();
+  if (document.activeElement !== $('#p-in-name')) $('#p-in-name').value = name;
+  if (document.activeElement !== $('#p-in-phone')) $('#p-in-phone').value = (p && p.phone) || '';
+  $('#p-reports').textContent = r.count || 0;
+  $('#p-votes').textContent = v.count || 0;
+}
+$('#profile-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = $('#p-in-name').value.trim();
+  if (name.length < 3) return toast('Escribe tu nombre completo.');
+  const btn = e.target.querySelector('button'); busy(btn, true);
+  const { error } = await sb.from('profiles').update({ full_name: name, phone: $('#p-in-phone').value.trim() || null }).eq('id', S.session.user.id);
+  busy(btn, false);
+  if (error) return toast(friendly(error));
+  toast('Tus datos se guardaron.'); loadProfile();
+});
+$('#btn-logout').onclick = async () => {
+  if (await confirmBox({ title: 'Cerrar sesión', text: '¿Quieres salir de tu cuenta?', ok: 'Salir' })) await sb.auth.signOut();
+};
+$('#btn-delete').onclick = async () => {
+  const ok = await confirmBox({ title: 'Eliminar cuenta', text: 'Se borrarán tu cuenta, tus reportes, confirmaciones y comentarios. Esta acción no se puede deshacer.', ok: 'Eliminar', danger: true });
+  if (!ok) return;
+  const { error } = await sb.rpc('delete_my_account');
+  if (error) return toast(friendly(error));
+  await sb.auth.signOut();
+  toast('Tu cuenta fue eliminada.');
+};
+
+// ---------- autenticación ----------
+let mode = 'login';
+function showAuth(view) {
+  $('#v-welcome').hidden = view !== 'welcome';
+  $('#v-form').hidden = view !== 'login' && view !== 'register';
+  $('#v-reset').hidden = view !== 'reset';
+  if (view === 'login' || view === 'register') {
+    mode = view;
+    const reg = view === 'register';
+    $$('.reg-only').forEach(el => { el.hidden = !reg; });
+    $$('.login-only').forEach(el => { el.hidden = reg; });
+    $('#f-title').textContent = reg ? 'Crear cuenta' : 'Iniciar sesión';
+    $('#f-sub').textContent = reg ? 'Únete a la comunidad y reporta lo que ves en la vía' : 'Bienvenido de nuevo a Alerta Tránsito';
+    $('#f-submit').textContent = reg ? 'Crear cuenta' : 'Iniciar sesión';
+    $('#f-switch-text').textContent = reg ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?';
+    $('#f-switch').textContent = reg ? 'Iniciar sesión' : 'Crear cuenta';
+    $('#f-pass').autocomplete = reg ? 'new-password' : 'current-password';
+    msg($('#f-msg'), '');
+  }
+  $('#auth').scrollTop = 0;
+}
+document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) showAuth(g.dataset.go); });
+$('#f-switch').onclick = () => showAuth(mode === 'login' ? 'register' : 'login');
+$('#f-eye').onclick = () => {
+  const p = $('#f-pass'); const show = p.type === 'password';
+  p.type = show ? 'text' : 'password';
+  $('#f-eye').innerHTML = `<i class="mdi mdi-eye${show ? '-off' : ''}-outline"></i>`;
+};
+const siteUrl = () => location.origin + location.pathname;
+$('#auth-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = $('#f-email').value.trim().toLowerCase(), password = $('#f-pass').value;
+  const m = $('#f-msg');
+  if (!/^\S+@\S+\.\S+$/.test(email)) return msg(m, 'Escribe un correo válido.');
+  if (password.length < 6) return msg(m, 'La contraseña debe tener al menos 6 caracteres.');
+  const name = $('#f-name').value.trim();
+  if (mode === 'register') {
+    if (name.length < 3) return msg(m, 'Escribe tu nombre completo.');
+    if (!$('#f-accept').checked) return msg(m, 'Debes aceptar la política de privacidad para crear la cuenta.');
+  }
+  const btn = $('#f-submit'); busy(btn, true);
+  try {
+    if (mode === 'login') {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } else {
+      const { data, error } = await sb.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: siteUrl(), data: { full_name: name, phone: $('#f-phone').value.trim() || null } },
+      });
+      if (error) throw error;
+      if (!data.session) msg(m, `Te enviamos un enlace a ${email}. Ábrelo para activar tu cuenta y entrarás automáticamente.`, true);
+    }
+  } catch (err) { msg(m, friendly(err)); }
+  finally { busy(btn, false); }
+});
+$('#f-forgot').onclick = async () => {
+  const email = $('#f-email').value.trim().toLowerCase(); const m = $('#f-msg');
+  if (!/^\S+@\S+\.\S+$/.test(email)) return msg(m, 'Escribe primero tu correo y vuelve a tocar "¿Olvidaste tu contraseña?".');
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: siteUrl() });
+  if (error) return msg(m, friendly(error));
+  msg(m, 'Te enviamos un enlace para crear una nueva contraseña. Revisa tu correo.', true);
+};
+$('#reset-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const p = $('#r-pass').value; const m = $('#r-msg');
+  if (p.length < 6) return msg(m, 'La contraseña debe tener al menos 6 caracteres.');
+  const { error } = await sb.auth.updateUser({ password: p });
+  if (error) return msg(m, friendly(error));
+  recovering = false; enterApp();
+  toast('Contraseña actualizada.');
+});
+
+// ---------- arranque ----------
+let started = false, recovering = false;
+function enterApp() {
+  $('#auth').hidden = true; $('#app').hidden = false;
+  if (!started) {
+    started = true;
+    initMap(); renderChips(); renderTypes();
+    setTab(isDesk() ? 'reportar' : 'mapa');
+    locate().then(ll => { if (ll) map.setView(ll, 14); renderLists(); });
+    loadReports(); subscribe();
+    setInterval(() => { loadReports(); }, 60000); // los reportes vencidos desaparecen
+  } else {
+    setTimeout(() => map.invalidateSize(), 50);
+    loadReports(); subscribe();
+  }
+}
+function leaveApp() {
+  $('#app').hidden = true; $('#auth').hidden = false; closeDetail();
+  if (S.channel) { sb.removeChannel(S.channel); S.channel = null; }
+  showAuth('welcome');
+}
+sb.auth.onAuthStateChange((event, session) => {
+  S.session = session;
+  if (event === 'PASSWORD_RECOVERY') { recovering = true; $('#app').hidden = true; $('#auth').hidden = false; showAuth('reset'); return; }
+  if (recovering) return;
+  if (session) enterApp(); else leaveApp();
+});
+showAuth('welcome');
+})();
+</script>
+</body>
+</html>
