@@ -13,6 +13,12 @@ Versión web de Alerta Tránsito. Es una comunidad que reporta fotomultas, reten
    - Agrega esa misma dirección en **Redirect URLs**.
    - Esto hace que los enlaces de confirmación de cuenta y de recuperación de contraseña abran la app.
 2. **SQL Editor**: pega el archivo `eliminar_cuenta.sql` y dale **Run**. Así se activa el botón "Eliminar mi cuenta".
+3. **SQL Editor**: pega el archivo `roles_admin.sql` y dale **Run**. Así se activan los roles de administrador y comunidad y el panel **Admin**.
+
+## Roles
+
+- **Comunidad**: publica reportes, confirma alertas ("Sigue ahí") y comenta. Su celular solo lo ve el administrador.
+- **Administrador**: tiene la pestaña **Admin**, con resumen, todos los reportes de 7 días, usuarios y comentarios. Puede borrar reportes y comentarios, bloquear o desbloquear usuarios y nombrar a otros administradores.
 
 ## Archivos
 

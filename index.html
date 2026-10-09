@@ -87,9 +87,9 @@ button{cursor:pointer;border:0;background:none;padding:0}
 #mapwrap{grid-area:main;position:relative;min-height:0}
 #map{position:absolute;inset:0;background:#e9eef5}
 #panel{grid-area:main;z-index:1000;background:var(--bg);overflow-y:auto;min-height:0}
-#nav{grid-area:nav;z-index:1100;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
+#nav{grid-area:nav;z-index:1100;display:flex;background:#fff;border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
 #app{grid-template-rows:1fr calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
-#nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;position:relative}
+#nav button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;position:relative}
 #nav button i{font-size:25px}
 #nav button[aria-current="page"]{color:var(--primary)}
 #nav .badge{position:absolute;top:8px;left:calc(50% + 6px);background:var(--danger);color:#fff;font-size:10px;font-weight:800;border-radius:9px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px}
@@ -182,6 +182,44 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .menu .chev{margin-left:auto;color:var(--muted)}
 .menu .red,.menu .red i{color:var(--danger)}
 .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+.role{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;border-radius:999px;padding:3px 9px;background:var(--primary-soft);color:var(--primary)}
+.role.admin{background:#0B1B4D;color:#fff}
+.role.blocked{background:#FDECEC;color:#B42318}
+.notice{display:flex;gap:10px;align-items:flex-start;background:#FFF4E5;color:#7A3E00;border-radius:12px;padding:12px;font-size:14px;line-height:1.4;margin-bottom:12px}
+.notice i{font-size:20px}
+/* Panel admin */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.kpi{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:14px}
+.kpi b{display:block;font-size:26px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi span{font-size:12.5px;color:var(--muted);font-weight:600}
+.kpi.alert b{color:var(--danger)}
+.bars{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:24px 1fr 34px;gap:10px;align-items:center;font-size:13px;font-weight:600}
+.bar .track{height:10px;background:var(--bg);border-radius:6px;overflow:hidden}
+.bar .fill{height:100%;border-radius:6px}
+.bar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--navy)}
+.adm-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.adm-tabs::-webkit-scrollbar{display:none}
+.adm-tabs button{flex:none;height:34px;padding:0 14px;border-radius:17px;border:1px solid var(--border);font-weight:700;font-size:13px;color:var(--navy);background:#fff}
+.adm-tabs button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.arow{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-bottom:1px solid var(--border)}
+.arow:last-child{border-bottom:0}
+.arow .info{flex:1;min-width:0}
+.arow .t{font-weight:800;font-size:14.5px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.arow .s{font-size:13px;color:#374151;overflow-wrap:anywhere}
+.arow .m{font-size:12px;color:var(--muted);margin-top:2px}
+.arow .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sbtn{height:32px;padding:0 10px;border-radius:9px;border:1px solid var(--border);font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:4px;background:#fff;color:var(--navy)}
+.sbtn:hover{background:var(--bg)}
+.sbtn.red{color:var(--danger);border-color:#F5C2C0}
+.sbtn.red:hover{background:#FDECEC}
+.sbtn i{font-size:16px}
+.tag{font-size:10.5px;font-weight:800;border-radius:6px;padding:2px 6px;background:var(--bg);color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.tag.on{background:#E8F7EE;color:#14632D}
+.adm-tools{display:flex;gap:8px;margin:12px 0}
+.adm-tools .field{flex:1;height:42px}
+.adm-tools select{height:42px;border-radius:12px;border:1px solid var(--border);background:#fff;padding:0 10px;font:inherit;font-size:13px;color:var(--navy);max-width:46%}
+.c-del{float:right;color:var(--danger);font-size:18px;padding:2px}
 
 /* ---------- Detalle (hoja) ---------- */
 .sheet-bg{position:fixed;inset:0;z-index:1500;background:rgba(3,5,12,.45);display:flex;align-items:flex-end;justify-content:center}
@@ -219,8 +257,8 @@ button{cursor:pointer;border:0;background:none;padding:0}
 @media (min-width:900px){
   #app{grid-template-columns:420px 1fr;grid-template-rows:auto 1fr;grid-template-areas:"nav main" "panel main"}
   #panel{grid-area:panel;border-right:1px solid var(--border);display:block!important}
-  #nav{grid-template-columns:repeat(3,1fr);height:auto;padding:0;border-top:0;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
-  #nav button{flex-direction:row;gap:6px;height:52px;font-size:14px}
+  #nav{height:auto;padding:0;border-top:0;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+  #nav button{flex-direction:row;gap:5px;height:52px;font-size:13.5px;padding:0 4px;white-space:nowrap}
   #nav button i{font-size:21px}
   #nav button[data-tab="mapa"]{display:none}
   #nav button[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--primary)}
@@ -299,6 +337,7 @@ button{cursor:pointer;border:0;background:none;padding:0}
     <button data-tab="reportar"><i class="mdi mdi-plus-circle-outline"></i>Reportar</button>
     <button data-tab="alertas"><i class="mdi mdi-bell-outline"></i>Notificaciones<span class="badge" id="badge" hidden></span></button>
     <button data-tab="perfil"><i class="mdi mdi-account-outline"></i>Perfil</button>
+    <button data-tab="admin" id="nav-admin" hidden><i class="mdi mdi-shield-crown-outline"></i>Admin</button>
   </nav>
 
   <main id="mapwrap">
@@ -340,6 +379,7 @@ button{cursor:pointer;border:0;background:none;padding:0}
           </div>
           <div class="point-note" id="r-point" hidden><i class="mdi mdi-check-circle"></i><span>Punto marcado en el mapa</span></div>
           <div class="field"><i class="mdi mdi-note-text-outline"></i><input id="r-ref" placeholder="Agregar referencia (opcional)" maxlength="200"></div>
+          <div class="notice" id="r-blocked" hidden style="margin:14px 0 0"><i class="mdi mdi-account-cancel-outline"></i><span>Tu cuenta está bloqueada por el administrador. Puedes ver el mapa, pero no publicar reportes ni comentarios.</span></div>
           <button class="btn" type="submit" id="r-submit" style="margin-top:14px">Publicar ubicación</button>
         </form>
         <div class="sec-head"><h3>Reportes recientes</h3><button class="link" data-tab-go="alertas">Ver todos</button></div>
@@ -366,6 +406,7 @@ button{cursor:pointer;border:0;background:none;padding:0}
         <div class="card profile-card" style="margin-top:0">
           <div class="avatar" id="p-avatar">?</div>
           <h3 id="p-name">Mi perfil</h3>
+          <div style="margin-top:6px"><span class="role" id="p-role">Comunidad</span></div>
           <p id="p-email"></p>
           <div class="stats"><div><b id="p-reports">0</b><span>Reportes</span></div><div><b id="p-votes">0</b><span>Confirmaciones</span></div></div>
         </div>
@@ -383,6 +424,19 @@ button{cursor:pointer;border:0;background:none;padding:0}
         </div>
         <p class="foot">Alerta Tránsito · Orion Nova Technologies<br>Mapa © colaboradores de OpenStreetMap</p>
       </div>
+    </section>
+    <!-- Admin -->
+    <section id="t-admin" hidden>
+      <div class="panel-head" style="flex-direction:column;align-items:stretch;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2>Administración</h2><span class="role admin"><i class="mdi mdi-shield-crown"></i>Admin</span></div>
+        <div class="adm-tabs" id="adm-tabs">
+          <button data-adm="resumen" aria-pressed="true">Resumen</button>
+          <button data-adm="reportes" aria-pressed="false">Reportes</button>
+          <button data-adm="usuarios" aria-pressed="false">Usuarios</button>
+          <button data-adm="comentarios" aria-pressed="false">Comentarios</button>
+        </div>
+      </div>
+      <div class="panel-body" id="adm-body"><div class="empty"><span class="spin dark" style="display:inline-block"></span></div></div>
     </section>
   </aside>
 </div>
@@ -424,6 +478,7 @@ const S = {
   session: null, reports: [], filter: 'todos', me: null, tab: 'mapa', type: 'foto_multa',
   seg: 'cerca', selected: null, picking: false, point: null, autoAddress: '', seen: new Set(), unseen: 0,
   loadedOnce: false, channel: null, detailId: null,
+  profile: null, isAdmin: false, blocked: false, adm: 'resumen', admUsers: null, admQuery: '', admType: 'todos',
 };
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -463,7 +518,10 @@ function friendly(e) {
   if (/Password should be at least/i.test(m)) return 'La contraseña debe tener al menos 6 caracteres.';
   if (/rate limit|too many/i.test(m)) return 'Demasiados intentos. Espera un minuto e inténtalo otra vez.';
   if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Sin conexión a internet. Revisa tu red.';
-  if (/could not find the function|delete_my_account/i.test(m)) return 'La eliminación automática aún no está activa. Escríbenos y la hacemos por ti.';
+  if (/row-level security|violates row-level/i.test(m)) return S.blocked ? 'Tu cuenta está bloqueada. No puedes publicar.' : 'No tienes permiso para hacer esto.';
+  if (/Solo para administradores/i.test(m)) return 'Esta acción es solo para administradores.';
+  if (/delete_my_account/i.test(m)) return 'La eliminación automática aún no está activa. Escríbenos y la hacemos por ti.';
+  if (/could not find the function|schema cache/i.test(m)) return 'Falta activar esta función en la base de datos: ejecuta roles_admin.sql en Supabase.';
   return m || 'Ocurrió un error inesperado.';
 }
 let toastTimer;
@@ -603,6 +661,7 @@ async function loadReports() {
   renderLists();
   renderBadge();
   if (S.detailId) refreshDetail();
+  if (S.tab === 'admin' && S.adm !== 'usuarios') renderAdmin(true);
 }
 function scheduleReload() { clearTimeout(reloadTimer); reloadTimer = setTimeout(loadReports, 350); }
 function subscribe() {
@@ -696,10 +755,9 @@ async function refreshDetail() {
   const ids = [...new Set(list.map(c => c.user_id))];
   let names = {};
   if (ids.length) {
-    const { data: p } = await sb.from('profiles').select('id, full_name').in('id', ids);
-    names = Object.fromEntries((p || []).map(x => [x.id, x.full_name]));
+    names = await getNames(ids);
   }
-  const t = T[r.type], mine = r.user_id === S.session.user.id;
+  const t = T[r.type], mine = r.user_id === S.session.user.id || S.isAdmin;
   box.innerHTML = `<div class="sheet-top"><div class="grab"></div>
       <div style="display:flex;align-items:center;gap:12px">${ticon(r.type, 52, true)}
         <div style="flex:1;min-width:0"><h3>${esc(t.label)}</h3><div style="color:var(--muted)">${timeAgo(r.created_at)}</div></div>
@@ -712,10 +770,16 @@ async function refreshDetail() {
         <a class="btn outline" style="height:46px;font-size:15px;text-decoration:none" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"><i class="mdi mdi-directions"></i>Cómo llegar</a>
       </div></div>
     <div style="font-weight:800;padding:16px 16px 8px">Comentarios (${list.length})</div>
-    ${list.length ? list.map(c => `<div class="comment"><b>${esc(names[c.user_id] || 'Usuario')}</b><p>${esc(c.body)}</p><small>${timeAgo(c.created_at)}</small></div>`).join('')
+    ${list.length ? list.map(c => `<div class="comment">${(S.isAdmin || c.user_id === S.session.user.id) ? `<button class="c-del" data-cdel="${c.id}" aria-label="Eliminar comentario"><i class="mdi mdi-trash-can-outline"></i></button>` : ''}<b>${esc(names[c.user_id] || 'Usuario')}</b><p>${esc(c.body)}</p><small>${timeAgo(c.created_at)}</small></div>`).join('')
       : '<p style="color:var(--muted);padding:0 16px 16px;margin:0">Sé el primero en comentar.</p>'}
     <div style="height:8px"></div>`;
   $('#d-close').onclick = closeDetail;
+  $('#compose').hidden = S.blocked;
+  $$('[data-cdel]', box).forEach(b => b.onclick = async () => {
+    const { error } = await sb.from('report_comments').delete().eq('id', b.dataset.cdel);
+    if (error) return toast(friendly(error));
+    toast('Comentario eliminado'); refreshDetail(); loadReports();
+  });
   $('#d-vote').onclick = async () => { await toggleVote(r); refreshDetail(); };
   if (mine) $('#d-del').onclick = async () => {
     const ok = await confirmBox({ title: 'Eliminar reporte', text: '¿Seguro que quieres eliminar este reporte?', ok: 'Eliminar', danger: true });
@@ -731,7 +795,9 @@ function setTab(tab) {
   if (isDesk() && tab === 'mapa') tab = S.tab === 'mapa' ? 'reportar' : S.tab;
   S.tab = tab;
   $$('#nav button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
-  ['reportar', 'alertas', 'perfil'].forEach(k => { $('#t-' + k).hidden = k !== tab; });
+  if (tab === 'admin' && !S.isAdmin) tab = S.tab = 'perfil';
+  ['reportar', 'alertas', 'perfil', 'admin'].forEach(k => { $('#t-' + k).hidden = k !== tab; });
+  if (tab === 'admin') renderAdmin();
   $('#panel').hidden = !isDesk() && tab === 'mapa';
   if (tab === 'alertas') { S.unseen = 0; renderBadge(); }
   if (tab === 'perfil') loadProfile();
@@ -847,6 +913,7 @@ async function loadProfile() {
   if (document.activeElement !== $('#p-in-phone')) $('#p-in-phone').value = (p && p.phone) || '';
   $('#p-reports').textContent = r.count || 0;
   $('#p-votes').textContent = v.count || 0;
+  applyRole();
 }
 $('#profile-form').addEventListener('submit', async e => {
   e.preventDefault();
@@ -943,6 +1010,207 @@ $('#reset-form').addEventListener('submit', async e => {
   toast('Contraseña actualizada.');
 });
 
+// ---------- roles ----------
+async function getNames(ids) {
+  const { data, error } = await sb.rpc('profile_names', { ids });
+  let rows = data;
+  if (error) rows = (await sb.from('profiles').select('id, full_name').in('id', ids)).data;
+  return Object.fromEntries((rows || []).map(x => [x.id, x.full_name]));
+}
+async function loadMe() {
+  if (!S.session) return;
+  const { data } = await sb.from('profiles').select('*').eq('id', S.session.user.id).maybeSingle();
+  S.profile = data || null;
+  S.isAdmin = !!(data && data.role === 'admin');
+  S.blocked = !!(data && data.blocked);
+  applyRole();
+}
+function applyRole() {
+  $('#nav-admin').hidden = !S.isAdmin;
+  const pr = $('#p-role');
+  pr.className = 'role' + (S.isAdmin ? ' admin' : S.blocked ? ' blocked' : '');
+  pr.innerHTML = S.isAdmin ? '<i class="mdi mdi-shield-crown"></i>Administrador' : S.blocked ? 'Bloqueado' : 'Comunidad';
+  $('#r-blocked').hidden = !S.blocked;
+  $('#r-submit').disabled = S.blocked;
+  if (!S.isAdmin && S.tab === 'admin') setTab('perfil');
+}
+
+// ---------- panel de administración ----------
+$('#adm-tabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-adm]'); if (!b) return;
+  S.adm = b.dataset.adm;
+  $$('#adm-tabs button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  renderAdmin();
+});
+let admBusy = false;
+async function renderAdmin(silent) {
+  if (!S.isAdmin || admBusy) return;
+  admBusy = true;
+  const body = $('#adm-body');
+  if (!silent) body.innerHTML = '<div class="empty"><span class="spin dark" style="display:inline-block"></span></div>';
+  try {
+    if (S.adm === 'resumen') await admResumen(body);
+    else if (S.adm === 'reportes') await admReportes(body);
+    else if (S.adm === 'usuarios') await admUsuarios(body);
+    else await admComentarios(body);
+  } catch (err) {
+    body.innerHTML = `<div class="notice"><i class="mdi mdi-alert-circle-outline"></i><span>${esc(friendly(err))}</span></div>`;
+  } finally { admBusy = false; }
+}
+async function admUsersMap(force) {
+  if (!S.admUsers || force) {
+    const { data, error } = await sb.rpc('admin_list_users');
+    if (error) throw error;
+    S.admUsers = data || [];
+  }
+  return Object.fromEntries(S.admUsers.map(u => [u.id, u]));
+}
+const dayStart = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString(); };
+async function admResumen(body) {
+  const since24 = new Date(Date.now() - 864e5).toISOString();
+  const [users, today, last24, comments] = await Promise.all([
+    admUsersMap(true),
+    sb.from('reports').select('id', { count: 'exact', head: true }).gte('created_at', dayStart()),
+    sb.from('reports').select('type').gte('created_at', since24).limit(5000),
+    sb.from('report_comments').select('id', { count: 'exact', head: true }).gte('created_at', dayStart()),
+  ]);
+  const list = Object.values(users);
+  const blocked = list.filter(u => u.blocked).length;
+  const byType = Object.fromEntries(TYPES.map(t => [t.key, 0]));
+  (last24.data || []).forEach(r => { byType[r.type] = (byType[r.type] || 0) + 1; });
+  const max = Math.max(1, ...Object.values(byType));
+  body.innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><b>${list.length}</b><span>Usuarios registrados</span></div>
+      <div class="kpi"><b>${S.reports.length}</b><span>Reportes activos (3 h)</span></div>
+      <div class="kpi"><b>${today.count || 0}</b><span>Reportes hoy</span></div>
+      <div class="kpi"><b>${comments.count || 0}</b><span>Comentarios hoy</span></div>
+      <div class="kpi ${blocked ? 'alert' : ''}"><b>${blocked}</b><span>Usuarios bloqueados</span></div>
+      <div class="kpi"><b>${list.filter(u => u.role === 'admin').length}</b><span>Administradores</span></div>
+    </div>
+    <div class="sec-head"><h3>Reportes por tipo · últimas 24 h</h3></div>
+    <div class="bars">${TYPES.map(t => `<div class="bar">${ticon(t.key, 24, true)}
+      <div><div style="margin-bottom:4px">${esc(t.label)}</div><div class="track"><div class="fill" style="width:${(byType[t.key] / max) * 100}%;background:${t.color}"></div></div></div>
+      <span class="n">${byType[t.key]}</span></div>`).join('')}</div>
+    <div class="sec-head"><h3>Últimos usuarios</h3><button class="link" data-admgo="usuarios">Ver todos</button></div>
+    <div class="list">${list.slice(0, 4).map(userRow).join('') || '<div class="empty">Sin usuarios todavía.</div>'}</div>`;
+  bindUserActions(body);
+  $$('[data-admgo]', body).forEach(b => b.onclick = () => $(`#adm-tabs [data-adm="${b.dataset.admgo}"]`).click());
+}
+async function admReportes(body) {
+  const since = new Date(Date.now() - 7 * 864e5).toISOString();
+  let q = sb.from('reports').select('*').gte('created_at', since).order('created_at', { ascending: false }).limit(300);
+  if (S.admType !== 'todos') q = q.eq('type', S.admType);
+  const [{ data, error }, users] = await Promise.all([q, admUsersMap()]);
+  if (error) throw error;
+  const active = new Set(S.reports.map(r => r.id));
+  body.innerHTML = `
+    <div class="adm-tools">
+      <select id="adm-type" aria-label="Filtrar por tipo"><option value="todos">Todos los tipos</option>${TYPES.map(t => `<option value="${t.key}" ${S.admType === t.key ? 'selected' : ''}>${esc(t.label)}</option>`).join('')}</select>
+      <div style="flex:1;align-self:center;color:var(--muted);font-size:13px;text-align:right">${(data || []).length} en 7 días</div>
+    </div>
+    <div class="list">${(data || []).map(r => {
+      const u = users[r.user_id];
+      return `<div class="arow">${ticon(r.type, 40)}<div class="info">
+        <div class="t">${esc(T[r.type].label)} <span class="tag ${active.has(r.id) ? 'on' : ''}">${active.has(r.id) ? 'Activo' : 'Vencido'}</span></div>
+        <div class="s">${esc(r.address)}${r.reference ? ' · ' + esc(r.reference) : ''}</div>
+        <div class="m">${timeAgo(r.created_at)} · por ${esc(u ? (u.full_name || u.email) : 'usuario eliminado')}</div>
+        <div class="acts">
+          <button class="sbtn" data-rview="${r.id}" data-lat="${r.lat}" data-lng="${r.lng}"><i class="mdi mdi-map-search-outline"></i>Ver en mapa</button>
+          <button class="sbtn red" data-rdel="${r.id}"><i class="mdi mdi-trash-can-outline"></i>Eliminar</button>
+        </div></div></div>`;
+    }).join('') || '<div class="empty"><i class="mdi mdi-map-marker-off"></i>No hay reportes en los últimos 7 días.</div>'}</div>`;
+  $('#adm-type').onchange = e => { S.admType = e.target.value; renderAdmin(); };
+  $$('[data-rview]', body).forEach(b => b.onclick = () => {
+    if (!isDesk()) setTab('mapa');
+    flyTo([+b.dataset.lat, +b.dataset.lng], 17);
+    if (active.has(b.dataset.rview)) select(b.dataset.rview);
+  });
+  $$('[data-rdel]', body).forEach(b => b.onclick = async () => {
+    const ok = await confirmBox({ title: 'Eliminar reporte', text: 'El reporte desaparecerá del mapa para todos los usuarios.', ok: 'Eliminar', danger: true });
+    if (!ok) return;
+    const { error: e2 } = await sb.from('reports').delete().eq('id', b.dataset.rdel);
+    if (e2) return toast(friendly(e2));
+    toast('Reporte eliminado'); loadReports(); renderAdmin(true);
+  });
+}
+function userRow(u) {
+  const me = u.id === S.session.user.id;
+  return `<div class="arow"><div class="avatar" style="width:40px;height:40px;font-size:17px;margin:0;flex:none;${u.blocked ? 'background:#B42318' : u.role === 'admin' ? 'background:#0B1B4D' : ''}">${esc((u.full_name || u.email || '?').charAt(0).toUpperCase())}</div>
+    <div class="info">
+      <div class="t">${esc(u.full_name || 'Sin nombre')} ${u.role === 'admin' ? '<span class="role admin">Admin</span>' : ''} ${u.blocked ? '<span class="role blocked">Bloqueado</span>' : ''} ${me ? '<span class="tag">Tú</span>' : ''}</div>
+      <div class="s">${esc(u.email)}${u.phone ? ' · ' + esc(u.phone) : ''}</div>
+      <div class="m">${u.reports} reporte${u.reports == 1 ? '' : 's'} · se unió ${timeAgo(u.created_at).toLowerCase()}${u.last_sign_in_at ? ' · última vez ' + timeAgo(u.last_sign_in_at).toLowerCase() : ''}</div>
+      ${me ? '' : `<div class="acts">
+        <button class="sbtn ${u.blocked ? '' : 'red'}" data-ublock="${u.id}" data-v="${!u.blocked}"><i class="mdi mdi-${u.blocked ? 'account-check-outline' : 'account-cancel-outline'}"></i>${u.blocked ? 'Desbloquear' : 'Bloquear'}</button>
+        <button class="sbtn" data-urole="${u.id}" data-v="${u.role === 'admin' ? 'usuario' : 'admin'}"><i class="mdi mdi-${u.role === 'admin' ? 'shield-off-outline' : 'shield-crown-outline'}"></i>${u.role === 'admin' ? 'Quitar admin' : 'Hacer admin'}</button>
+      </div>`}
+    </div></div>`;
+}
+function bindUserActions(root) {
+  $$('[data-ublock]', root).forEach(b => b.onclick = async () => {
+    const value = b.dataset.v === 'true';
+    const ok = await confirmBox(value
+      ? { title: 'Bloquear usuario', text: 'No podrá publicar reportes, comentar ni confirmar alertas. Podrá seguir viendo el mapa.', ok: 'Bloquear', danger: true }
+      : { title: 'Desbloquear usuario', text: 'Podrá volver a publicar y comentar.', ok: 'Desbloquear' });
+    if (!ok) return;
+    const { error } = await sb.rpc('admin_set_blocked', { target: b.dataset.ublock, value });
+    if (error) return toast(friendly(error));
+    toast(value ? 'Usuario bloqueado' : 'Usuario desbloqueado'); S.admUsers = null; renderAdmin(true);
+  });
+  $$('[data-urole]', root).forEach(b => b.onclick = async () => {
+    const role = b.dataset.v;
+    const ok = await confirmBox(role === 'admin'
+      ? { title: 'Hacer administrador', text: 'Tendrá acceso a este panel: podrá borrar reportes y comentarios y bloquear usuarios.', ok: 'Hacer admin' }
+      : { title: 'Quitar administrador', text: 'Volverá a ser un usuario de la comunidad.', ok: 'Quitar', danger: true });
+    if (!ok) return;
+    const { error } = await sb.rpc('admin_set_role', { target: b.dataset.urole, new_role: role });
+    if (error) return toast(friendly(error));
+    toast('Rol actualizado'); S.admUsers = null; renderAdmin(true);
+  });
+}
+async function admUsuarios(body) {
+  const users = Object.values(await admUsersMap(true));
+  const draw = () => {
+    const q = S.admQuery.toLowerCase();
+    const list = users.filter(u => !q || [u.full_name, u.email, u.phone].some(x => (x || '').toLowerCase().includes(q)));
+    $('#adm-ulist').innerHTML = list.map(userRow).join('') || '<div class="empty"><i class="mdi mdi-account-search-outline"></i>No hay usuarios con ese dato.</div>';
+    bindUserActions($('#adm-ulist'));
+  };
+  body.innerHTML = `<div class="adm-tools"><div class="field"><i class="mdi mdi-magnify"></i><input id="adm-q" placeholder="Buscar por nombre, correo o celular" value="${esc(S.admQuery)}"></div></div>
+    <div style="color:var(--muted);font-size:13px;margin:0 2px 8px">${users.length} usuario${users.length === 1 ? '' : 's'} registrados</div>
+    <div class="list" id="adm-ulist"></div>`;
+  $('#adm-q').oninput = e => { S.admQuery = e.target.value; draw(); };
+  draw();
+}
+async function admComentarios(body) {
+  const { data, error } = await sb.from('report_comments').select('id, body, created_at, user_id, report_id').order('created_at', { ascending: false }).limit(100);
+  if (error) throw error;
+  const users = await admUsersMap();
+  const rids = [...new Set((data || []).map(c => c.report_id))];
+  let reps = {};
+  if (rids.length) {
+    const { data: rr } = await sb.from('reports').select('id, type, address').in('id', rids);
+    reps = Object.fromEntries((rr || []).map(r => [r.id, r]));
+  }
+  body.innerHTML = `<div class="list">${(data || []).map(c => {
+    const u = users[c.user_id], r = reps[c.report_id];
+    return `<div class="arow"><i class="mdi mdi-comment-text-outline" style="font-size:24px;color:var(--navy)"></i><div class="info">
+      <div class="t">${esc(u ? (u.full_name || u.email) : 'Usuario')}</div>
+      <div class="s">${esc(c.body)}</div>
+      <div class="m">${timeAgo(c.created_at)}${r ? ' · en ' + esc(T[r.type].label) + ', ' + esc(r.address) : ''}</div>
+      <div class="acts"><button class="sbtn red" data-cdel2="${c.id}"><i class="mdi mdi-trash-can-outline"></i>Eliminar</button></div>
+    </div></div>`;
+  }).join('') || '<div class="empty"><i class="mdi mdi-comment-off-outline"></i>Aún no hay comentarios.</div>'}</div>`;
+  $$('[data-cdel2]', body).forEach(b => b.onclick = async () => {
+    const ok = await confirmBox({ title: 'Eliminar comentario', text: 'Se borrará para todos los usuarios.', ok: 'Eliminar', danger: true });
+    if (!ok) return;
+    const { error: e2 } = await sb.from('report_comments').delete().eq('id', b.dataset.cdel2);
+    if (e2) return toast(friendly(e2));
+    toast('Comentario eliminado'); renderAdmin(true); loadReports();
+  });
+}
+
 // ---------- arranque ----------
 let started = false, recovering = false;
 function enterApp() {
@@ -952,11 +1220,11 @@ function enterApp() {
     initMap(); renderChips(); renderTypes();
     setTab(isDesk() ? 'reportar' : 'mapa');
     locate().then(ll => { if (ll) map.setView(ll, 14); renderLists(); });
-    loadReports(); subscribe();
+    loadMe(); loadReports(); subscribe();
     setInterval(() => { loadReports(); }, 60000); // los reportes vencidos desaparecen
   } else {
     setTimeout(() => map.invalidateSize(), 50);
-    loadReports(); subscribe();
+    loadMe(); loadReports(); subscribe();
   }
 }
 function leaveApp() {
@@ -968,7 +1236,7 @@ sb.auth.onAuthStateChange((event, session) => {
   S.session = session;
   if (event === 'PASSWORD_RECOVERY') { recovering = true; $('#app').hidden = true; $('#auth').hidden = false; showAuth('reset'); return; }
   if (recovering) return;
-  if (session) enterApp(); else leaveApp();
+  setTimeout(() => { if (session) enterApp(); else leaveApp(); }, 0);
 });
 showAuth('welcome');
 // Enlace de correo vencido o ya usado (#error=...&error_code=otp_expired)
