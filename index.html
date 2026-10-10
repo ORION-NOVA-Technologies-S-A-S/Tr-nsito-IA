@@ -696,6 +696,7 @@ function friendly(e) {
   if (/Email not confirmed/i.test(m)) return 'Primero confirma tu correo: abre el enlace que te enviamos.';
   if (/already registered/i.test(m)) return 'Ya existe una cuenta con ese correo. Inicia sesión.';
   if (/Password should be at least/i.test(m)) return 'La contraseña debe tener al menos 6 caracteres.';
+  if (/email rate limit/i.test(m)) return 'Ya se enviaron muchos correos de confirmación en esta hora. Inténtalo más tarde o avisa al administrador.';
   if (/rate limit|too many/i.test(m)) return 'Demasiados intentos. Espera un minuto e inténtalo otra vez.';
   if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Sin conexión a internet. Revisa tu red.';
   if (/row-level security|violates row-level/i.test(m)) return S.blocked ? 'Tu cuenta está bloqueada. No puedes publicar.' : 'No tienes permiso para hacer esto.';
