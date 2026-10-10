@@ -2092,10 +2092,20 @@ function userRow(u) {
       ${me ? '' : `<div class="acts">
         <button class="sbtn ${u.blocked ? '' : 'red'}" data-ublock="${u.id}" data-v="${!u.blocked}"><i class="mdi mdi-${u.blocked ? 'account-check-outline' : 'account-cancel-outline'}"></i>${u.blocked ? 'Desbloquear' : 'Bloquear'}</button>
         <button class="sbtn" data-urole="${u.id}" data-v="${u.role === 'admin' ? 'usuario' : 'admin'}"><i class="mdi mdi-${u.role === 'admin' ? 'shield-off-outline' : 'shield-crown-outline'}"></i>${u.role === 'admin' ? 'Quitar admin' : 'Hacer admin'}</button>
+        ${u.role === 'admin' ? '' : `<button class="sbtn red" data-udel="${u.id}" data-name="${esc(u.full_name || u.email)}"><i class="mdi mdi-account-remove-outline"></i>Eliminar</button>`}
       </div>`}
     </div></div>`;
 }
 function bindUserActions(root) {
+  $$('[data-udel]', root).forEach(b => b.onclick = async () => {
+    const ok = await confirmBox({ title: `Eliminar a ${b.dataset.name}`,
+      text: 'Se borrará su cuenta junto con sus reportes, confirmaciones, comentarios, solicitudes y su empresa si es dueño. Los pagos que ya tenga en Finanzas se conservan. Esta acción no se puede deshacer.',
+      ok: 'Eliminar', danger: true });
+    if (!ok) return;
+    const { error } = await sb.rpc('admin_delete_user', { target: b.dataset.udel });
+    if (error) return toast(/admin_delete_user|could not find/i.test(error.message || '') ? 'Falta activar esta función: ejecuta eliminar_usuario.sql en Supabase.' : friendly(error));
+    toast('Usuario eliminado.'); S.admUsers = null; renderAdmin(true); loadReports();
+  });
   $$('[data-ublock]', root).forEach(b => b.onclick = async () => {
     const value = b.dataset.v === 'true';
     const ok = await confirmBox(value
