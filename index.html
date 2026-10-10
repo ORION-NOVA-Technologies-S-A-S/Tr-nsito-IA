@@ -228,6 +228,49 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .role.blocked{background:#FDECEC;color:#B42318}
 .notice{display:flex;gap:10px;align-items:flex-start;background:#FFF4E5;color:#7A3E00;border-radius:12px;padding:12px;font-size:14px;line-height:1.4;margin-bottom:12px}
 .notice i{font-size:20px}
+/* Planes */
+.plan-now{display:flex;align-items:center;gap:12px;color:var(--text);background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:14px;margin-top:14px;width:100%;text-align:left}
+.plan-now .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;flex:none;background:#64748B}
+.plan-now.plus .ic{background:linear-gradient(135deg,#1E5EFF,#38BDF8)}
+.plan-now.empresa .ic{background:linear-gradient(135deg,#0B1B4D,#1E5EFF)}
+.plan-now .info{flex:1;min-width:0}
+.plan-now b{display:block;font-size:16px;font-weight:800}
+.plan-now span{display:block;font-size:13px;color:var(--muted)}
+.plan-now .go{color:var(--primary);font-weight:800;font-size:13px;white-space:nowrap}
+.pchip{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:800;letter-spacing:.6px;border-radius:999px;padding:2px 8px;text-transform:uppercase;background:var(--bg);color:var(--muted)}
+.pchip.plus{background:linear-gradient(135deg,#1E5EFF,#38BDF8);color:#fff}
+.pchip.empresa{background:#0B1B4D;color:#fff}
+.plans{display:flex;flex-direction:column;gap:14px}
+.plan{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:18px;border:2px solid transparent;position:relative}
+.plan.current{border-color:var(--ok)}
+.plan.best{border-color:var(--primary)}
+.plan .ribbon{position:absolute;top:-11px;right:16px;background:var(--primary);color:#fff;font-size:11px;font-weight:800;letter-spacing:.5px;border-radius:999px;padding:4px 10px;text-transform:uppercase}
+.plan.current .ribbon{background:var(--ok)}
+.plan h3{margin:0;font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px}
+.plan .price{margin:6px 0 2px;font-size:30px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.plan .price small{font-size:14px;font-weight:600;color:var(--muted);letter-spacing:0}
+.plan .who{color:var(--muted);font-size:13.5px;margin:0 0 12px}
+.plan ul{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:8px}
+.plan li{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.35}
+.plan li i{color:var(--ok);font-size:18px;flex:none;margin-top:-1px}
+.plan .btn{height:48px;font-size:15px}
+.pay-box{background:var(--bg);border:1px dashed #B8C4DA;border-radius:12px;padding:12px;font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:12px}
+.dialog.wide{max-width:440px;max-height:90vh;overflow-y:auto}
+.dialog label.lbl{display:block;font-size:13px;font-weight:700;color:var(--navy);margin:10px 0 6px}
+.dialog .field{height:46px}
+.drive-banner{position:absolute;left:16px;right:76px;top:auto;bottom:28px;z-index:905;background:#0B1B4D;color:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);max-width:420px}
+.drive-banner i{font-size:26px;color:#38BDF8}
+.drive-banner .txt{flex:1;min-width:0}
+.drive-banner b{display:block;font-size:14px}
+.drive-banner span{display:block;font-size:12px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drive-banner button{background:#fff;color:#0B1B4D;font-weight:800;border-radius:10px;height:34px;padding:0 12px;font-size:13px}
+.ctrl.drive[aria-pressed="true"]{background:#0B1B4D;color:#38BDF8}
+.ctrl .lock{position:absolute;right:-4px;top:-4px;background:linear-gradient(135deg,#1E5EFF,#38BDF8);color:#fff;border-radius:999px;font-size:9px;font-weight:800;padding:2px 5px;letter-spacing:.4px}
+.ctrl{position:relative}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.set-grid .full{grid-column:1 / -1}
+textarea.ta{width:100%;min-height:90px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font:inherit;font-size:14px;resize:vertical;background:#fff;color:var(--text)}
+.dialog select,.adm-body select{height:42px;border-radius:10px;border:1px solid var(--border);background:#fff;padding:0 10px;font:inherit;font-size:13px}
 /* Panel admin */
 .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .kpi{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:14px}
@@ -258,7 +301,8 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .tag{font-size:10.5px;font-weight:800;border-radius:6px;padding:2px 6px;background:var(--bg);color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 .tag.on{background:#E8F7EE;color:#14632D}
 .adm-tools{display:flex;gap:8px;margin:12px 0}
-.adm-tools .field{flex:1;height:42px}
+.adm-tools .field{flex:1;min-width:0;height:42px}
+.adm-tools .btn{flex:none}
 .adm-tools select{height:42px;border-radius:12px;border:1px solid var(--border);background:#fff;padding:0 10px;font:inherit;font-size:13px;color:var(--navy);max-width:46%}
 .c-del{float:right;color:var(--danger);font-size:18px;padding:2px}
 
@@ -407,12 +451,14 @@ button{cursor:pointer;border:0;background:none;padding:0}
       <div class="sv-msg" id="sv-msg" hidden></div>
     </div>
     <div class="map-ctrl">
+      <button class="ctrl drive" id="btn-drive" aria-pressed="false" aria-label="Modo conducción con avisos por voz" title="Modo conducción"><i class="mdi mdi-steering"></i><span class="lock" id="drive-lock">PLUS</span></button>
       <button class="ctrl sv" id="btn-sv" aria-pressed="false" aria-label="Ver la calle: arrastra el muñeco al mapa o tócalo y luego toca un punto" title="Arrástrame al mapa para ver la calle"><i class="mdi mdi-human-handsdown"></i></button>
       <button class="ctrl" id="btn-me" aria-label="Mi ubicación"><i class="mdi mdi-crosshairs-gps"></i></button>
       <div class="zoom"><button id="z-in" aria-label="Acercar"><i class="mdi mdi-plus"></i></button><button id="z-out" aria-label="Alejar"><i class="mdi mdi-minus"></i></button></div>
     </div>
     <button class="sel-card" id="sel-card" hidden></button>
     <div class="empty-badge" id="empty-badge" hidden></div>
+    <div class="drive-banner" id="drive-banner" hidden><i class="mdi mdi-steering"></i><div class="txt"><b>Modo conducción activo</b><span id="drive-txt">Te avisaremos por voz si hay alertas a menos de 500 m</span></div><button id="drive-stop">Detener</button></div>
     <div class="pick-banner" id="sv-banner" hidden><i class="mdi mdi-human-handsdown" style="font-size:20px;color:#FFB300"></i>Toca la calle que quieres ver <button id="sv-cancel">Cancelar</button></div>
     <div class="pick-banner" id="pick-banner" hidden><i class="mdi mdi-gesture-tap" style="font-size:20px"></i>Toca el mapa donde está la alerta <button id="pick-cancel">Cancelar</button></div>
   </main>
@@ -446,7 +492,7 @@ button{cursor:pointer;border:0;background:none;padding:0}
       <div class="panel-head" style="flex-direction:column;align-items:stretch;gap:8px">
         <div style="display:flex;justify-content:space-between;align-items:center"><h2>Alertas</h2><span class="live">En vivo · últimas 3 h</span></div>
         <div class="seg" id="seg">
-          <button data-seg="cerca" aria-pressed="true">Cerca de mí (5 km)</button>
+          <button data-seg="cerca" aria-pressed="true" id="seg-cerca">Cerca de mí (5 km)</button>
           <button data-seg="todas" aria-pressed="false">Todas</button>
         </div>
       </div>
@@ -460,10 +506,12 @@ button{cursor:pointer;border:0;background:none;padding:0}
         <div class="card profile-card" style="margin-top:0">
           <div class="avatar" id="p-avatar">?</div>
           <h3 id="p-name">Mi perfil</h3>
-          <div style="margin-top:6px"><span class="role" id="p-role">Comunidad</span></div>
+          <div style="margin-top:6px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><span class="role" id="p-role">Comunidad</span><span class="pchip" id="p-plan" hidden></span></div>
           <p id="p-email"></p>
           <div class="stats"><div><b id="p-reports">0</b><span>Reportes</span></div><div><b id="p-votes">0</b><span>Confirmaciones</span></div></div>
         </div>
+        <button class="plan-now" id="plan-now" data-tab-go="planes"></button>
+        <div id="my-company"></div>
         <div class="sec-head"><h3>Mis datos</h3></div>
         <form class="stack" id="profile-form" novalidate>
           <div class="field"><i class="mdi mdi-account-outline"></i><input id="p-in-name" placeholder="Nombre completo" maxlength="80"></div>
@@ -479,6 +527,12 @@ button{cursor:pointer;border:0;background:none;padding:0}
         <p class="foot">Alerta Tránsito · Orion Nova Technologies<br>Mapa © colaboradores de OpenStreetMap</p>
       </div>
     </section>
+    <!-- Planes -->
+    <section id="t-planes" hidden>
+      <div class="panel-head"><div style="display:flex;align-items:center;gap:10px"><button class="round" data-tab-go="perfil" aria-label="Volver al perfil"><i class="mdi mdi-arrow-left"></i></button><h2>Planes</h2></div></div>
+      <div class="panel-body" id="planes-body"></div>
+    </section>
+
     <!-- Admin -->
     <section id="t-admin" hidden>
       <div class="panel-head" style="flex-direction:column;align-items:stretch;gap:10px">
@@ -488,6 +542,7 @@ button{cursor:pointer;border:0;background:none;padding:0}
           <button data-adm="reportes" aria-pressed="false">Reportes</button>
           <button data-adm="usuarios" aria-pressed="false">Usuarios</button>
           <button data-adm="comentarios" aria-pressed="false">Comentarios</button>
+          <button data-adm="planes" aria-pressed="false" id="adm-planes-btn">Planes</button>
         </div>
       </div>
       <div class="panel-body" id="adm-body"><div class="empty"><span class="spin dark" style="display:inline-block"></span></div></div>
@@ -508,7 +563,8 @@ button{cursor:pointer;border:0;background:none;padding:0}
 const SUPABASE_URL = 'https://hgwzuhizruwsdbditsai.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnd3p1aGl6cnV3c2RiZGl0c2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTM2NTIsImV4cCI6MjEwNzEyOTY1Mn0.QDPKrTzyT1zXkse821iror6YfEv74yqGeh1z3C-pklU'; // clave pública (anon); la seguridad la dan las políticas RLS
 const DEFAULT_CENTER = [4.6533, -74.0836]; // Bogotá
-const NEAR_KM = 5;
+const NEAR_KM_FREE = 5, NEAR_KM_PLUS = 20;
+const DRIVE_M = 500; // distancia de aviso en modo conducción
 // Clave de Google Maps (Maps JavaScript API) para ver la calle dentro de la app.
 // Restríngela en Google Cloud a: https://orion-nova-technologies-s-a-s.github.io/*
 const GOOGLE_MAPS_KEY = '';
@@ -538,6 +594,7 @@ const S = {
   session: null, reports: [], filter: 'todos', me: null, tab: 'mapa', type: 'foto_multa',
   seg: 'cerca', selected: null, picking: false, point: null, autoAddress: '', seen: new Set(), unseen: 0,
   loadedOnce: false, channel: null, detailId: null,
+  myPlan: { plan: 'gratis' }, settings: null, plansReady: true, driving: false,
   profile: null, isAdmin: false, blocked: false, adm: 'resumen', admUsers: null, admQuery: '', admType: 'todos',
 };
 const $ = (s, r = document) => r.querySelector(s);
@@ -740,6 +797,7 @@ function subscribe() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, scheduleReload)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'report_votes' }, scheduleReload)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'report_comments' }, scheduleReload)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'plan_requests' }, () => { loadPlan(); if (S.tab === 'admin' && S.adm === 'planes') renderAdmin(true); else if (S.isAdmin) countPending(); })
     .subscribe();
 }
 async function toggleVote(r) {
@@ -768,7 +826,7 @@ function renderLists() {
   $('#recent').innerHTML = recent.length ? recent.map(r => itemHTML(r)).join('')
     : `<div class="empty"><i class="mdi mdi-map-marker-plus-outline"></i>Aún no hay reportes. ¡Sé el primero en reportar!</div>`;
   let list = S.reports.map(r => ({ r, k: km(S.me, [r.lat, r.lng]) }));
-  if (S.seg === 'cerca') list = S.me ? list.filter(x => x.k != null && x.k <= NEAR_KM) : [];
+  if (S.seg === 'cerca') list = S.me ? list.filter(x => x.k != null && x.k <= nearKm()) : [];
   $('#alerts').innerHTML = list.length ? list.map(x => itemHTML(x.r, fmtKm(x.k))).join('')
     : `<div class="empty"><i class="mdi mdi-bell-check-outline"></i>${S.seg === 'cerca' && !S.me
       ? 'Activa tu ubicación para ver las alertas cerca de ti.<br><button class="link" id="ask-loc" style="margin-top:8px">Activar ubicación</button>'
@@ -868,11 +926,12 @@ function setTab(tab) {
   S.tab = tab;
   $$('#nav button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
   if (tab === 'admin' && !S.isAdmin) tab = S.tab = 'perfil';
-  ['reportar', 'alertas', 'perfil', 'admin'].forEach(k => { $('#t-' + k).hidden = k !== tab; });
+  ['reportar', 'alertas', 'perfil', 'admin', 'planes'].forEach(k => { $('#t-' + k).hidden = k !== tab; });
+  if (tab === 'planes') renderPlanes();
   if (tab === 'admin') renderAdmin();
   $('#panel').hidden = !isDesk() && tab === 'mapa';
   if (tab === 'alertas') { S.unseen = 0; renderBadge(); }
-  if (tab === 'perfil') loadProfile();
+  if (tab === 'perfil') { loadProfile(); loadPlan(); }
   if (tab === 'mapa' && map) setTimeout(() => map.invalidateSize(), 50);
   if (!isDesk() && tab !== 'mapa' && !$('#sv-view').hidden) closeStreet();
   $('#panel').scrollTop = 0;
@@ -1259,6 +1318,7 @@ async function loadMe() {
   S.isAdmin = !!(data && data.role === 'admin');
   S.blocked = !!(data && data.blocked);
   applyRole();
+  loadPlan();
 }
 function applyRole() {
   $('#nav-admin').hidden = !S.isAdmin;
@@ -1268,6 +1328,297 @@ function applyRole() {
   $('#r-blocked').hidden = !S.blocked;
   $('#r-submit').disabled = S.blocked;
   if (!S.isAdmin && S.tab === 'admin') setTab('perfil');
+}
+
+// ---------- planes Plus y Empresa ----------
+const PLAN_NAMES = { gratis: 'Gratis', plus: 'Plus', empresa: 'Empresa' };
+const cop = n => '$' + Number(n || 0).toLocaleString('es-CO');
+const fmtDate = d => new Date(d).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+const hasPlus = () => S.myPlan.plan === 'plus' || S.myPlan.plan === 'empresa';
+const nearKm = () => hasPlus() ? NEAR_KM_PLUS : NEAR_KM_FREE;
+let myRequests = [];
+async function loadPlan() {
+  if (!S.session) return;
+  const [mp, st, rq] = await Promise.all([
+    sb.rpc('my_plan'),
+    sb.from('app_settings').select('*').eq('id', 1).maybeSingle(),
+    sb.from('plan_requests').select('*').eq('user_id', S.session.user.id).order('created_at', { ascending: false }).limit(5),
+  ]);
+  S.plansReady = !mp.error;
+  S.myPlan = (mp.data && mp.data[0]) || { plan: 'gratis' };
+  S.settings = st.data || { plus_price: 6900, empresa_price: 89900, empresa_seats: 10, pay_instructions: '' };
+  myRequests = rq.data || [];
+  applyPlan();
+  if (S.tab === 'planes') renderPlanes();
+  if (S.tab === 'perfil') renderCompany();
+  if (S.isAdmin) countPending();
+}
+function applyPlan() {
+  const mp = S.myPlan, pl = mp.plan || 'gratis';
+  const pn = $('#plan-now');
+  pn.className = 'plan-now ' + pl;
+  const pending = myRequests.find(r => r.status === 'pendiente');
+  const sub = pl === 'gratis'
+    ? (pending ? `Solicitud de ${PLAN_NAMES[pending.plan]} en revisión` : 'Mejora a Plus: avisos por voz al conducir')
+    : pl === 'empresa' ? `${esc(mp.company_name || 'Tu empresa')} · hasta el ${fmtDate(mp.plan_until)}` : `Activo hasta el ${fmtDate(mp.plan_until)}`;
+  pn.innerHTML = `<span class="ic"><i class="mdi mdi-${pl === 'gratis' ? 'star-outline' : pl === 'plus' ? 'star-four-points' : 'domain'}"></i></span>
+    <span class="info"><b>Plan ${PLAN_NAMES[pl]}</b><span>${sub}</span></span><span class="go">${pl === 'gratis' ? 'Mejorar' : 'Ver plan'} <i class="mdi mdi-chevron-right"></i></span>`;
+  $('#drive-lock').hidden = hasPlus();
+  const pp = $('#p-plan'); pp.hidden = pl === 'gratis'; pp.className = 'pchip ' + pl; pp.innerHTML = pl === 'plus' ? '<i class="mdi mdi-star-four-points"></i>Plus' : '<i class="mdi mdi-domain"></i>Empresa';
+  $('#seg-cerca').textContent = `Cerca de mí (${nearKm()} km)`;
+  if (!hasPlus() && S.driving) stopDrive();
+  renderLists();
+}
+function planFeatures() {
+  const st = S.settings || {};
+  return [
+    { key: 'gratis', title: 'Gratis', icon: 'star-outline', price: 0, who: 'Para toda la comunidad',
+      items: ['Mapa de alertas en tiempo real', 'Reportar, confirmar y comentar', `Alertas cerca de ti (${NEAR_KM_FREE} km)`, 'Insignia "Libre de agentes" de tu zona', 'Vista de calle con el muñeco'] },
+    { key: 'plus', title: 'Plus', icon: 'star-four-points', price: st.plus_price, who: 'Para conductores que manejan todos los días',
+      items: ['Todo lo del plan Gratis', `Modo conducción: aviso por voz y vibración cuando te acercas a menos de ${DRIVE_M} m de un retén, agente, control o fotomulta`, `Alertas en un radio de ${NEAR_KM_PLUS} km`, 'Insignia Plus en tu perfil', 'Apoyas a que la app siga creciendo'] },
+    { key: 'empresa', title: 'Empresa', icon: 'domain', price: st.empresa_price, who: `Para flotas, mensajería, taxis y transporte · hasta ${st.empresa_seats || 10} conductores`,
+      items: [`Plan Plus para hasta ${st.empresa_seats || 10} conductores`, 'Panel "Mi empresa": agrega y quita conductores por correo', 'Actividad de reportes de cada conductor (últimos 7 días)', 'Factura con NIT de tu empresa', 'Soporte directo por WhatsApp'] },
+  ];
+}
+function renderPlanes() {
+  const body = $('#planes-body'); if (!body) return;
+  const cur = S.myPlan.plan || 'gratis';
+  const pending = myRequests.find(r => r.status === 'pendiente');
+  const lastRejected = myRequests.find(r => r.status === 'rechazada');
+  let head = '';
+  if (!S.plansReady) head = `<div class="notice"><i class="mdi mdi-progress-wrench"></i><span>Los planes se están activando. Muy pronto podrás solicitarlos.</span></div>`;
+  else if (pending) head = `<div class="notice" style="background:#EAF0FF;color:#1747C7"><i class="mdi mdi-timer-sand"></i><span><b>Tu solicitud de plan ${PLAN_NAMES[pending.plan]} está en revisión.</b><br>Enviada ${timeAgo(pending.created_at).toLowerCase()}. Te activaremos el plan cuando confirmemos el pago.</span></div>`;
+  else if (lastRejected && myRequests[0] === lastRejected) head = `<div class="notice"><i class="mdi mdi-alert-circle-outline"></i><span><b>Tu última solicitud no fue aprobada.</b>${lastRejected.admin_note ? '<br>' + esc(lastRejected.admin_note) : ''}</span></div>`;
+  if (cur !== 'gratis') head += `<div class="notice" style="background:#E8F7EE;color:#14532D"><i class="mdi mdi-check-decagram"></i><span><b>Tienes el plan ${PLAN_NAMES[cur]}</b> activo hasta el ${fmtDate(S.myPlan.plan_until)}. Puedes renovarlo antes de que venza y se suma el tiempo.</span></div>`;
+  body.innerHTML = head + `<div class="plans">${planFeatures().map(p => {
+    const isCur = p.key === cur, best = p.key === 'plus' && cur === 'gratis';
+    const btn = p.key === 'gratis' ? (isCur ? '<button class="btn outline" disabled>Tu plan actual</button>' : '')
+      : `<button class="btn" data-want="${p.key}" ${(!S.plansReady || pending) ? 'disabled' : ''}>${isCur ? 'Renovar' : p.key === 'plus' ? 'Quiero Plus' : 'Quiero el plan Empresa'}</button>`;
+    return `<div class="plan ${isCur ? 'current' : best ? 'best' : ''}">${isCur ? '<span class="ribbon">Tu plan</span>' : best ? '<span class="ribbon">Recomendado</span>' : ''}
+      <h3><i class="mdi mdi-${p.icon}" style="color:var(--primary)"></i>${p.title}</h3>
+      <div class="price">${p.price ? cop(p.price) : '$0'}<small> / mes</small></div>
+      <p class="who">${esc(p.who)}</p>
+      <ul>${p.items.map(i => `<li><i class="mdi mdi-check-circle"></i><span>${esc(i)}</span></li>`).join('')}</ul>${btn}</div>`;
+  }).join('')}</div>
+  <p class="foot">Precios en pesos colombianos, IVA incluido si aplica. El plan se activa cuando confirmamos tu pago.</p>`;
+  $$('[data-want]', body).forEach(b => b.onclick = () => requestPlan(b.dataset.want));
+}
+function requestPlan(plan) {
+  const st = S.settings || {};
+  const price = plan === 'plus' ? st.plus_price : st.empresa_price;
+  const root = $('#modal-root');
+  root.innerHTML = `<div class="sheet-bg" style="align-items:center"><form class="dialog wide" id="req-form" role="dialog" aria-modal="true" novalidate>
+    <h3>Solicitar plan ${PLAN_NAMES[plan]} · ${cop(price)} / mes</h3>
+    <p style="margin-bottom:10px">1. Paga el valor del plan así:</p>
+    <div class="pay-box">${esc(st.pay_instructions || 'El administrador aún no ha configurado los datos de pago.')}</div>
+    <p style="margin-bottom:0">2. Llena estos datos y envía la solicitud:</p>
+    ${plan === 'empresa' ? `<label class="lbl" for="q-company">Nombre de la empresa</label><div class="field"><input id="q-company" maxlength="120" placeholder="Ej: Mensajería Rápida SAS"></div>
+    <label class="lbl" for="q-nit">NIT (para la factura)</label><div class="field"><input id="q-nit" maxlength="30" placeholder="Ej: 901234567-8"></div>` : ''}
+    <label class="lbl" for="q-phone">Celular de contacto</label><div class="field"><input id="q-phone" type="tel" maxlength="20" value="${esc((S.profile && S.profile.phone) || '')}" placeholder="Ej: 3001234567"></div>
+    <label class="lbl" for="q-ref">Número o referencia del pago</label><div class="field"><input id="q-ref" maxlength="120" placeholder="Ej: M1234567 o comprobante Nequi"></div>
+    <div id="q-msg" hidden style="margin-top:10px"></div>
+    <div class="row2" style="margin-top:16px"><button type="button" class="btn outline" id="q-cancel">Cancelar</button><button class="btn" id="q-send">Enviar solicitud</button></div>
+  </form></div>`;
+  $('#q-cancel').onclick = () => { root.innerHTML = ''; };
+  $('#req-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const m = $('#q-msg');
+    const phone = $('#q-phone').value.trim(), ref = $('#q-ref').value.trim();
+    const company = plan === 'empresa' ? $('#q-company').value.trim() : null;
+    if (plan === 'empresa' && company.length < 2) return msg(m, 'Escribe el nombre de la empresa.');
+    if (phone.length < 7) return msg(m, 'Escribe un celular de contacto.');
+    if (ref.length < 3) return msg(m, 'Escribe la referencia del pago para que podamos confirmarlo.');
+    const btn = $('#q-send'); busy(btn, true);
+    const { error } = await sb.from('plan_requests').insert({
+      plan, company_name: company, nit: plan === 'empresa' ? ($('#q-nit').value.trim() || null) : null, contact_phone: phone, payment_ref: ref,
+    });
+    busy(btn, false);
+    if (error) return msg(m, friendly(error));
+    root.innerHTML = '';
+    toast('Solicitud enviada. Te avisaremos cuando se active tu plan.');
+    loadPlan();
+  });
+}
+// ----- Mi empresa (dueño) -----
+async function renderCompany() {
+  const box = $('#my-company'); if (!box) return;
+  const mp = S.myPlan;
+  if (mp.plan !== 'empresa' && !mp.company_id) { box.innerHTML = ''; return; }
+  if (!mp.is_owner) {
+    box.innerHTML = `<div class="notice" style="background:#EAF0FF;color:#0B1B4D;margin-top:14px"><i class="mdi mdi-domain"></i><span>Eres conductor de <b>${esc(mp.company_name || 'una empresa')}</b>. Tienes todos los beneficios Plus.</span></div>`;
+    return;
+  }
+  const { data, error } = await sb.rpc('company_members');
+  if (error) { box.innerHTML = ''; return; }
+  const list = data || [];
+  box.innerHTML = `<div class="sec-head"><h3>Mi empresa · ${esc(mp.company_name || '')}</h3><span style="color:var(--muted);font-size:13px">${list.length}/${mp.seats} cupos</span></div>
+    <form class="adm-tools" id="co-add" style="margin-top:0" novalidate><div class="field"><i class="mdi mdi-account-plus-outline"></i><input id="co-email" type="email" placeholder="Correo del conductor"></div><button class="btn" style="width:auto;padding:0 16px;height:42px;font-size:14px">Agregar</button></form>
+    <p style="color:var(--muted);font-size:12.5px;margin:-4px 2px 10px">El conductor debe tener una cuenta creada en Alerta Tránsito.</p>
+    <div class="list">${list.map(u => `<div class="arow"><div class="avatar" style="width:38px;height:38px;font-size:16px;margin:0;flex:none">${esc((u.full_name || u.email || '?').charAt(0).toUpperCase())}</div>
+      <div class="info"><div class="t">${esc(u.full_name || 'Sin nombre')} ${u.is_owner ? '<span class="tag">Dueño</span>' : ''}</div>
+      <div class="s">${esc(u.email)}</div><div class="m">${u.reports_7d} reporte${u.reports_7d == 1 ? '' : 's'} en 7 días${u.last_sign_in_at ? ' · última vez ' + timeAgo(u.last_sign_in_at).toLowerCase() : ''}</div>
+      ${u.is_owner ? '' : `<div class="acts"><button class="sbtn red" data-corm="${u.id}"><i class="mdi mdi-account-remove-outline"></i>Quitar</button></div>`}</div></div>`).join('')}</div>`;
+  $('#co-add').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = $('#co-email').value.trim();
+    if (!/^\S+@\S+\.\S+$/.test(email)) return toast('Escribe un correo válido.');
+    const { error: e2 } = await sb.rpc('company_add_member', { member_email: email });
+    if (e2) return toast(friendly(e2));
+    toast('Conductor agregado.'); loadPlan();
+  });
+  $$('[data-corm]', box).forEach(b => b.onclick = async () => {
+    if (!await confirmBox({ title: 'Quitar conductor', text: 'Perderá los beneficios del plan Empresa.', ok: 'Quitar', danger: true })) return;
+    const { error: e3 } = await sb.rpc('company_remove_member', { member: b.dataset.corm });
+    if (e3) return toast(friendly(e3));
+    toast('Conductor quitado.'); loadPlan();
+  });
+}
+// ----- Modo conducción (Plus) -----
+let driveWatch = null, announced = new Set(), driveLast = 0;
+function say(text) {
+  try {
+    if (!('speechSynthesis' in window)) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'es-CO'; u.rate = 1;
+    const v = speechSynthesis.getVoices().find(x => /^es/i.test(x.lang));
+    if (v) u.voice = v;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch (_) {}
+}
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.25, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    o.start(); o.stop(ctx.currentTime + 0.4);
+  } catch (_) {}
+}
+function checkDrive() {
+  if (!S.driving || !S.me) return;
+  const near = S.reports
+    .filter(r => r.type !== 'via_libre')
+    .map(r => ({ r, m: km(S.me, [r.lat, r.lng]) * 1000 }))
+    .filter(x => x.m <= DRIVE_M && !announced.has(x.r.id))
+    .sort((a, b) => a.m - b.m);
+  const x = near[0];
+  if (!x) { $('#drive-txt').textContent = `Sin alertas a menos de ${DRIVE_M} m · te avisaremos por voz`; return; }
+  announced.add(x.r.id);
+  const label = T[x.r.type].label, dist = x.m < 100 ? 'muy cerca' : `a ${Math.round(x.m / 50) * 50} metros`;
+  $('#drive-txt').textContent = `${label} ${dist} · ${x.r.address}`;
+  beep();
+  try { navigator.vibrate && navigator.vibrate([300, 150, 300]); } catch (_) {}
+  setTimeout(() => say(`Atención. ${label} ${dist}, en ${x.r.address}.`), 450);
+}
+function startDrive() {
+  if (!hasPlus()) {
+    confirmBox({ title: 'Modo conducción es del plan Plus', text: `Te avisa por voz y vibración cuando te acercas a menos de ${DRIVE_M} m de un retén, agente, control o fotomulta. Cuesta ${cop((S.settings || {}).plus_price || 6900)} al mes.`, ok: 'Ver planes' })
+      .then(ok => { if (ok) setTab('planes'); });
+    return;
+  }
+  if (!navigator.geolocation) return toast('Tu navegador no permite usar la ubicación.');
+  S.driving = true; announced = new Set();
+  $('#btn-drive').setAttribute('aria-pressed', 'true'); $('#drive-banner').hidden = false; $('#empty-badge').hidden = true;
+  say('Modo conducción activado. Te avisaré si hay alertas cerca.');
+  driveWatch = navigator.geolocation.watchPosition(p => {
+    S.me = [p.coords.latitude, p.coords.longitude]; drawMe();
+    const now = Date.now(); if (now - driveLast > 4000) { driveLast = now; renderZone(); }
+    if (map && (S.tab === 'mapa' || isDesk())) map.panTo(S.me, { animate: true });
+    checkDrive();
+  }, () => toast('No pudimos leer tu ubicación. Revisa el permiso.'), { enableHighAccuracy: true, maximumAge: 3000 });
+  try { navigator.wakeLock && navigator.wakeLock.request('screen').then(l => { S.wake = l; }).catch(() => {}); } catch (_) {}
+}
+function stopDrive() {
+  S.driving = false;
+  if (driveWatch != null) { navigator.geolocation.clearWatch(driveWatch); driveWatch = null; }
+  $('#btn-drive').setAttribute('aria-pressed', 'false'); $('#drive-banner').hidden = true;
+  try { S.wake && S.wake.release(); } catch (_) {}
+  try { speechSynthesis.cancel(); } catch (_) {}
+}
+$('#btn-drive').onclick = () => S.driving ? stopDrive() : startDrive();
+$('#drive-stop').onclick = stopDrive;
+
+// ----- Admin > Planes -----
+async function countPending() {
+  const { data } = await sb.rpc('admin_list_requests');
+  const n = (data || []).filter(r => r.status === 'pendiente').length;
+  const b = $('#adm-planes-btn'); if (b) b.textContent = n ? `Planes (${n})` : 'Planes';
+}
+async function admPlanes(body) {
+  const [rq, subs, st] = await Promise.all([sb.rpc('admin_list_requests'), sb.rpc('admin_list_subscriptions'), sb.from('app_settings').select('*').eq('id', 1).maybeSingle()]);
+  if (rq.error) throw rq.error;
+  const reqs = rq.data || [], pend = reqs.filter(r => r.status === 'pendiente'), done = reqs.filter(r => r.status !== 'pendiente').slice(0, 15);
+  const set = st.data || {};
+  const now = Date.now();
+  const active = (subs.data || []).filter(x => new Date(x.plan_until).getTime() > now);
+  const income = active.reduce((a, x) => a + (x.kind === 'plus' ? set.plus_price : set.empresa_price), 0);
+  const $b = $('#adm-planes-btn'); if ($b) $b.textContent = pend.length ? `Planes (${pend.length})` : 'Planes';
+  const reqRow = r => `<div class="arow"><span class="pchip ${r.plan}" style="flex:none;margin-top:2px">${PLAN_NAMES[r.plan]}</span><div class="info">
+      <div class="t">${esc(r.plan === 'empresa' ? (r.company_name || 'Empresa') : (r.full_name || r.email))}</div>
+      <div class="s">${esc(r.email)}${r.contact_phone ? ' · ' + esc(r.contact_phone) : ''}${r.nit ? ' · NIT ' + esc(r.nit) : ''}</div>
+      <div class="m">Pago: <b>${esc(r.payment_ref || '—')}</b> · ${timeAgo(r.created_at).toLowerCase()}${r.status !== 'pendiente' ? ' · ' + (r.status === 'aprobada' ? '✅ aprobada' : '❌ rechazada') : ''}</div>
+      ${r.status === 'pendiente' ? `<div class="acts"><select id="m-${r.id}" aria-label="Meses"><option value="1">1 mes</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">12 meses</option></select>
+        <button class="sbtn" data-appr="${r.id}" style="color:var(--ok);border-color:#BBE5C8"><i class="mdi mdi-check-circle-outline"></i>Aprobar</button>
+        <button class="sbtn red" data-rej="${r.id}"><i class="mdi mdi-close-circle-outline"></i>Rechazar</button></div>` : ''}
+    </div></div>`;
+  body.innerHTML = `
+    <div class="kpis">
+      <div class="kpi ${pend.length ? 'alert' : ''}"><b>${pend.length}</b><span>Solicitudes pendientes</span></div>
+      <div class="kpi"><b>${cop(income)}</b><span>Ingreso mensual activo</span></div>
+      <div class="kpi"><b>${active.filter(x => x.kind === 'plus').length}</b><span>Usuarios Plus activos</span></div>
+      <div class="kpi"><b>${active.filter(x => x.kind === 'empresa').length}</b><span>Empresas activas</span></div>
+    </div>
+    <div class="sec-head"><h3>Solicitudes pendientes</h3></div>
+    <div class="list">${pend.map(reqRow).join('') || '<div class="empty"><i class="mdi mdi-inbox-outline"></i>No hay solicitudes por revisar.</div>'}</div>
+    <div class="sec-head"><h3>Suscripciones</h3></div>
+    <div class="list">${(subs.data || []).map(x => {
+      const on = new Date(x.plan_until).getTime() > now;
+      return `<div class="arow"><span class="pchip ${x.kind}" style="flex:none;margin-top:2px">${PLAN_NAMES[x.kind]}</span><div class="info">
+        <div class="t">${esc(x.name || x.email)} <span class="tag ${on ? 'on' : ''}">${on ? 'Activo' : 'Vencido'}</span></div>
+        <div class="s">${esc(x.email)}${x.kind === 'empresa' ? ` · ${x.members}/${x.seats} conductores` : ''}</div>
+        <div class="m">${on ? 'Vence' : 'Venció'} el ${fmtDate(x.plan_until)}</div>
+        ${on ? `<div class="acts"><button class="sbtn red" data-end="${x.owner_or_user}"><i class="mdi mdi-cancel"></i>Terminar plan</button></div>` : ''}</div></div>`;
+    }).join('') || '<div class="empty"><i class="mdi mdi-star-outline"></i>Aún no hay suscripciones.</div>'}</div>
+    <div class="sec-head"><h3>Precios y datos de pago</h3></div>
+    <form class="card" id="set-form" style="margin-top:0" novalidate>
+      <div class="set-grid">
+        <div><label class="lbl" for="s-plus" style="font-size:13px;font-weight:700;color:var(--navy)">Plus (COP/mes)</label><div class="field"><input id="s-plus" type="number" min="0" step="100" value="${set.plus_price || 0}"></div></div>
+        <div><label class="lbl" for="s-emp" style="font-size:13px;font-weight:700;color:var(--navy)">Empresa (COP/mes)</label><div class="field"><input id="s-emp" type="number" min="0" step="100" value="${set.empresa_price || 0}"></div></div>
+        <div><label class="lbl" for="s-seats" style="font-size:13px;font-weight:700;color:var(--navy)">Cupos Empresa</label><div class="field"><input id="s-seats" type="number" min="1" max="500" value="${set.empresa_seats || 10}"></div></div>
+        <div class="full"><label class="lbl" for="s-pay" style="font-size:13px;font-weight:700;color:var(--navy)">Instrucciones de pago (las ve el usuario)</label>
+          <textarea class="ta" id="s-pay" maxlength="800" placeholder="Ej: Nequi 300 123 4567 a nombre de Orion Nova Technologies. Bancolombia ahorros 123-456789-00.">${esc(set.pay_instructions || '')}</textarea></div>
+      </div>
+      <button class="btn" style="margin-top:12px">Guardar</button>
+    </form>
+    <div class="sec-head"><h3>Revisadas recientemente</h3></div>
+    <div class="list">${done.map(reqRow).join('') || '<div class="empty">Nada por aquí todavía.</div>'}</div>`;
+  $$('[data-appr]', body).forEach(b => b.onclick = async () => {
+    const months = +$('#m-' + b.dataset.appr).value;
+    if (!await confirmBox({ title: 'Aprobar plan', text: `¿Ya confirmaste el pago? El plan se activará por ${months} mes${months > 1 ? 'es' : ''}.`, ok: 'Aprobar' })) return;
+    const { error } = await sb.rpc('admin_approve_request', { req: b.dataset.appr, months });
+    if (error) return toast(friendly(error));
+    toast('Plan activado.'); renderAdmin(true);
+  });
+  $$('[data-rej]', body).forEach(b => b.onclick = async () => {
+    if (!await confirmBox({ title: 'Rechazar solicitud', text: 'El usuario verá que su solicitud no fue aprobada y podrá enviar otra.', ok: 'Rechazar', danger: true })) return;
+    const { error } = await sb.rpc('admin_reject_request', { req: b.dataset.rej, note: 'No pudimos confirmar el pago. Revisa la referencia e inténtalo de nuevo.' });
+    if (error) return toast(friendly(error));
+    toast('Solicitud rechazada.'); renderAdmin(true);
+  });
+  $$('[data-end]', body).forEach(b => b.onclick = async () => {
+    if (!await confirmBox({ title: 'Terminar plan', text: 'El plan se desactiva de inmediato.', ok: 'Terminar', danger: true })) return;
+    const { error } = await sb.rpc('admin_end_plan', { target: b.dataset.end });
+    if (error) return toast(friendly(error));
+    toast('Plan terminado.'); renderAdmin(true);
+  });
+  $('#set-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const upd = { plus_price: Math.max(0, +$('#s-plus').value || 0), empresa_price: Math.max(0, +$('#s-emp').value || 0),
+      empresa_seats: Math.min(500, Math.max(1, +$('#s-seats').value || 10)), pay_instructions: $('#s-pay').value.trim(), updated_at: new Date().toISOString() };
+    const { error } = await sb.from('app_settings').update(upd).eq('id', 1);
+    if (error) return toast(friendly(error));
+    toast('Precios y datos de pago guardados.'); loadPlan();
+  });
 }
 
 // ---------- panel de administración ----------
@@ -1287,6 +1638,7 @@ async function renderAdmin(silent) {
     if (S.adm === 'resumen') await admResumen(body);
     else if (S.adm === 'reportes') await admReportes(body);
     else if (S.adm === 'usuarios') await admUsuarios(body);
+    else if (S.adm === 'planes') await admPlanes(body);
     else await admComentarios(body);
   } catch (err) {
     body.innerHTML = `<div class="notice"><i class="mdi mdi-alert-circle-outline"></i><span>${esc(friendly(err))}</span></div>`;

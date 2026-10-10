@@ -15,6 +15,15 @@ Versión web de Alerta Tránsito. Es una comunidad que reporta fotomultas, reten
 2. **SQL Editor**: pega el archivo `eliminar_cuenta.sql` y dale **Run**. Así se activa el botón "Eliminar mi cuenta".
 3. **SQL Editor**: pega el archivo `roles_admin.sql` y dale **Run**. Así se activan los roles de administrador y comunidad y el panel **Admin**.
 
+4. **SQL Editor**: pega `via_libre.sql` y luego `planes.sql`, y dale **Run** a cada uno. Así se activan el tipo "Libre de agentes" y los planes Plus y Empresa.
+
+## Planes
+
+- **Gratis**: mapa en vivo, reportes, alertas a 5 km, insignia de zona y vista de calle.
+- **Plus** ($6.900/mes): modo conducción con avisos por voz a 500 m, alertas a 20 km e insignia Plus.
+- **Empresa** ($89.900/mes): Plus para hasta 10 conductores y panel "Mi empresa".
+- El cobro es manual: el usuario paga, envía la referencia y el admin aprueba en **Admin → Planes**, donde también se editan precios y datos de pago.
+
 ## Roles
 
 - **Comunidad**: publica reportes, confirma alertas ("Sigue ahí") y comenta. Su celular solo lo ve el administrador.
