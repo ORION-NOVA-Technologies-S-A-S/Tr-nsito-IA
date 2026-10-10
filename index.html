@@ -631,6 +631,8 @@ const DRIVE_M = 500; // distancia de aviso en modo conducción
 // Clave de Google Maps (Maps JavaScript API) para ver la calle dentro de la app.
 // Restríngela en Google Cloud a: https://orion-nova-technologies-s-a-s.github.io/*
 const GOOGLE_MAPS_KEY = '';
+// Alternativa gratis: Mapillary (fotos de calles subidas por la comunidad). Token de cliente "MLY|..."
+const MAPILLARY_TOKEN = '';
 
 const TYPES = [
   { key: 'agente',         label: 'Agente de tránsito', chip: 'Agente',         icon: 'police-badge',   color: '#1E5EFF' },
@@ -1279,7 +1281,8 @@ function svFail(kind, ll) {
   const ext = ll ? `<a class="btn" target="_blank" rel="noopener" href="${streetUrl(ll)}"><i class="mdi mdi-open-in-new"></i>Abrir en Google Maps</a>` : '';
   $('#sv-sub').textContent = '';
   if (kind === 'nopano') svShowMsg(`<i class="mdi mdi-image-off-outline"></i><div><b>No hay vista de calle en este punto</b><br>Arrastra el muñeco sobre una calle principal.</div>`);
-  else if (kind === 'key') svShowMsg(`<i class="mdi mdi-key-alert-outline"></i><div><b>La vista de calle aún no está activada</b><br>Falta configurar la clave de Google Maps de la app.</div>${ext}`);
+  else if (kind === 'nomly') svShowMsg(`<i class="mdi mdi-image-off-outline"></i><div><b>Aún no hay fotos de esta calle</b><br>Prueba en una avenida principal o ábrela en Google Maps.</div>${ext}`);
+  else if (kind === 'key') svShowMsg(`<i class="mdi mdi-key-alert-outline"></i><div><b>La vista de calle aún no está activada</b><br>Falta conectar el servicio de fotos de calles (Mapillary o Google). Mientras tanto, puedes verla en Google Maps.</div>${ext}`);
   else svShowMsg(`<i class="mdi mdi-wifi-off"></i><div><b>No se pudo cargar la vista de calle</b><br>Revisa tu conexión e inténtalo de nuevo.</div>${ext}`);
 }
 function placeSvMarker(ll) {
@@ -1294,6 +1297,7 @@ async function openStreet(ll, label) {
   $('#sv-sub').textContent = 'Buscando la calle más cercana…';
   $('#sv-ext').href = streetUrl(ll);
   if (!label) reverse(ll).then(a => { if (a && !v.hidden) $('#sv-title').textContent = a; });
+  if (!GOOGLE_MAPS_KEY && MAPILLARY_TOKEN) return openMapillary(ll);
   if (!GOOGLE_MAPS_KEY) return svFail('key', ll);
   try { await loadGoogle(); } catch (e) { return svFail('net', ll); }
   if (!svService) svService = new google.maps.StreetViewService();
@@ -1319,6 +1323,51 @@ async function openStreet(ll, label) {
     const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
     $('#sv-sub').textContent = d ? `Foto de ${meses[+d[1] - 1] || ''} ${d[0]} · arrastra para mirar, toca las flechas para avanzar` : 'Arrastra para mirar, toca las flechas para avanzar';
   });
+}
+// ----- Vista de calle gratis con Mapillary -----
+let mlyViewer = null, mlyLoading = null;
+function loadMapillary() {
+  if (window.mapillary) return Promise.resolve();
+  if (mlyLoading) return mlyLoading;
+  mlyLoading = new Promise((res, rej) => {
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.css'; document.head.appendChild(css);
+    const sc = document.createElement('script'); sc.src = 'https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js';
+    sc.onload = () => res(); sc.onerror = () => { mlyLoading = null; rej(new Error('Failed to fetch')); };
+    document.head.appendChild(sc);
+  });
+  return mlyLoading;
+}
+async function nearestMapillary(ll) {
+  for (const d of [0.0006, 0.0015, 0.003]) { // ~65 m, ~165 m, ~330 m
+    const bbox = [ll[1] - d, ll[0] - d, ll[1] + d, ll[0] + d].map(x => x.toFixed(6)).join(',');
+    const r = await fetch(`https://graph.mapillary.com/images?access_token=${encodeURIComponent(MAPILLARY_TOKEN)}&fields=id,captured_at,computed_geometry,geometry&bbox=${bbox}&limit=100`);
+    if (!r.ok) throw new Error('mly ' + r.status);
+    const list = ((await r.json()).data || []).map(x => {
+      const g = (x.computed_geometry || x.geometry || {}).coordinates || [0, 0];
+      return { id: x.id, at: x.captured_at, k: km(ll, [g[1], g[0]]) };
+    }).sort((a, b) => a.k - b.k);
+    if (list.length) return list[0];
+  }
+  return null;
+}
+async function openMapillary(ll) {
+  try {
+    const [img] = await Promise.all([nearestMapillary(ll), loadMapillary()]);
+    if ($('#sv-view').hidden) return;
+    if (!img) return svFail('nomly', ll);
+    $('#sv-pano').style.visibility = 'visible';
+    if (!mlyViewer) {
+      mlyViewer = new mapillary.Viewer({ accessToken: MAPILLARY_TOKEN, container: 'sv-pano', imageId: img.id, component: { cover: false } });
+      mlyViewer.on('image', ev => {
+        const im = ev.image; const g = im && (im.lngLat || im.originalLngLat);
+        if (g) { placeSvMarker([g.lat, g.lng]); $('#sv-ext').href = streetUrl([g.lat, g.lng]); }
+      });
+    } else { await mlyViewer.moveTo(img.id); mlyViewer.resize(); }
+    const dt = img.at ? new Date(img.at) : null;
+    $('#sv-sub').textContent = `${dt ? 'Foto de ' + dt.toLocaleDateString('es-CO', { month: 'short', year: 'numeric' }) + ' · ' : ''}a ${fmtKm(img.k)} del punto · arrastra para mirar, usa las flechas para avanzar · Mapillary`;
+  } catch (e) {
+    svFail(/mly 40[13]/.test(e.message) ? 'key' : 'net', ll);
+  }
 }
 function closeStreet() {
   $('#sv-view').hidden = true;
