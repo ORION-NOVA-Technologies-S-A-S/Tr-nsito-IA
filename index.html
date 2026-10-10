@@ -119,6 +119,13 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .sel-card .m{font-size:12px;color:var(--muted)}
 .pick-banner{position:absolute;left:50%;transform:translateX(-50%);bottom:28px;z-index:900;background:var(--navy);color:#fff;border-radius:12px;padding:10px 14px;display:flex;gap:10px;align-items:center;box-shadow:var(--shadow);font-weight:600;font-size:14px;width:max-content;max-width:calc(100% - 32px)}
 .pick-banner button{color:var(--cyan);font-weight:800}
+.ctrl.sv{background:#FFB300;color:#3B2600;touch-action:none;cursor:grab;font-size:28px}
+.ctrl.sv:active{cursor:grabbing}
+.ctrl.sv[aria-pressed="true"]{box-shadow:0 0 0 3px #fff,0 0 0 6px #FFB300}
+.sv-ghost{position:fixed;z-index:4000;pointer-events:none;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center}
+.sv-ghost i{font-size:46px;color:#FFB300;text-shadow:0 0 0 #000,0 2px 6px rgba(0,0,0,.45);-webkit-text-stroke:1.5px #3B2600}
+.sv-ghost span{width:14px;height:6px;border-radius:50%;background:rgba(0,0,0,.35);margin-top:-4px}
+.sv-drop{font-size:40px;color:#FFB300;-webkit-text-stroke:1.5px #3B2600;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 .empty-badge{position:absolute;left:16px;right:76px;bottom:28px;z-index:900;background:rgba(255,255,255,.95);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);font-size:13px;font-weight:600;color:var(--navy);max-width:420px}
 
 /* Marcadores */
@@ -355,11 +362,13 @@ button{cursor:pointer;border:0;background:none;padding:0}
       <div class="chips" id="chips"></div>
     </div>
     <div class="map-ctrl">
+      <button class="ctrl sv" id="btn-sv" aria-pressed="false" aria-label="Ver la calle: arrastra el muñeco al mapa o tócalo y luego toca un punto" title="Arrástrame al mapa para ver la calle"><i class="mdi mdi-human-handsdown"></i></button>
       <button class="ctrl" id="btn-me" aria-label="Mi ubicación"><i class="mdi mdi-crosshairs-gps"></i></button>
       <div class="zoom"><button id="z-in" aria-label="Acercar"><i class="mdi mdi-plus"></i></button><button id="z-out" aria-label="Alejar"><i class="mdi mdi-minus"></i></button></div>
     </div>
     <button class="sel-card" id="sel-card" hidden></button>
     <div class="empty-badge" id="empty-badge" hidden></div>
+    <div class="pick-banner" id="sv-banner" hidden><i class="mdi mdi-human-handsdown" style="font-size:20px;color:#FFB300"></i>Toca la calle que quieres ver <button id="sv-cancel">Cancelar</button></div>
     <div class="pick-banner" id="pick-banner" hidden><i class="mdi mdi-gesture-tap" style="font-size:20px"></i>Toca el mapa donde está la alerta <button id="pick-cancel">Cancelar</button></div>
   </main>
 
@@ -590,6 +599,7 @@ function initMap() {
   }).addTo(map);
   layer = L.layerGroup().addTo(map);
   map.on('click', e => {
+    if (S.svMode) { svMode(false); return openStreet([e.latlng.lat, e.latlng.lng]); }
     if (S.picking) return setPoint([e.latlng.lat, e.latlng.lng]);
     select(null);
   });
@@ -768,6 +778,7 @@ async function refreshDetail() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
         <button class="btn ${r.voted_by_me ? '' : 'outline'}" id="d-vote" style="height:46px;font-size:15px"><i class="mdi mdi-thumb-up${r.voted_by_me ? '' : '-outline'}"></i>${r.voted_by_me ? 'Confirmado' : 'Sigue ahí'} · ${r.votes}</button>
         <a class="btn outline" style="height:46px;font-size:15px;text-decoration:none" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"><i class="mdi mdi-directions"></i>Cómo llegar</a>
+        <a class="btn outline" style="height:46px;font-size:15px;text-decoration:none;grid-column:1 / -1" target="_blank" rel="noopener" href="${streetUrl([r.lat, r.lng])}"><i class="mdi mdi-human-handsdown" style="color:#E09A00"></i>Ver la calle</a>
       </div></div>
     <div style="font-weight:800;padding:16px 16px 8px">Comentarios (${list.length})</div>
     ${list.length ? list.map(c => `<div class="comment">${(S.isAdmin || c.user_id === S.session.user.id) ? `<button class="c-del" data-cdel="${c.id}" aria-label="Eliminar comentario"><i class="mdi mdi-trash-can-outline"></i></button>` : ''}<b>${esc(names[c.user_id] || 'Usuario')}</b><p>${esc(c.body)}</p><small>${timeAgo(c.created_at)}</small></div>`).join('')
@@ -845,6 +856,7 @@ async function setPoint(ll, fromGps) {
   if (addr) { S.autoAddress = addr; $('#r-address').value = addr; }
 }
 function startPick() {
+  if (S.svMode) svMode(false);
   S.picking = true; select(null);
   $('#pick-banner').hidden = false; $('#empty-badge').hidden = true;
   if (!isDesk()) setTab('mapa');
@@ -1009,6 +1021,61 @@ $('#reset-form').addEventListener('submit', async e => {
   recovering = false; enterApp();
   toast('Contraseña actualizada.');
 });
+
+// ---------- muñeco: vista de calle ----------
+function streetUrl(ll) { return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${ll[0].toFixed(6)},${ll[1].toFixed(6)}`; }
+let svMarker;
+function openStreet(ll) {
+  if (svMarker) map.removeLayer(svMarker);
+  svMarker = L.marker(ll, { interactive: false, icon: L.divIcon({ className: '', html: '<i class="mdi mdi-human-handsdown sv-drop"></i>', iconSize: [40, 40], iconAnchor: [20, 38] }) }).addTo(map);
+  setTimeout(() => { if (svMarker) { map.removeLayer(svMarker); svMarker = null; } }, 6000);
+  const a = document.createElement('a');
+  a.href = streetUrl(ll); a.target = '_blank'; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Abriendo la vista de calle en Google Maps…');
+}
+function svMode(on) {
+  S.svMode = on;
+  if (on) { if (S.picking) stopPick(); select(null); }
+  $('#btn-sv').setAttribute('aria-pressed', on);
+  $('#sv-banner').hidden = !on;
+  $('#empty-badge').hidden = on || $('#empty-badge').hidden;
+  map.getContainer().style.cursor = on ? 'crosshair' : '';
+  if (!on) drawMarkers();
+}
+(function () {
+  const btn = $('#btn-sv');
+  let drag = null;
+  btn.addEventListener('pointerdown', e => {
+    drag = { x: e.clientX, y: e.clientY, ghost: null };
+    try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  btn.addEventListener('pointermove', e => {
+    if (!drag) return;
+    if (!drag.ghost && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 8) {
+      drag.ghost = document.createElement('div');
+      drag.ghost.className = 'sv-ghost';
+      drag.ghost.innerHTML = '<i class="mdi mdi-human-handsdown"></i><span></span>';
+      document.body.appendChild(drag.ghost);
+      if (S.svMode) svMode(false);
+    }
+    if (drag.ghost) { drag.ghost.style.left = e.clientX + 'px'; drag.ghost.style.top = e.clientY + 'px'; }
+  });
+  const end = e => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (!d.ghost) return svMode(!S.svMode); // toque: modo "toca la calle"
+    d.ghost.remove();
+    if (e.type === 'pointercancel') return;
+    const rect = map.getContainer().getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+    openStreet((ll => [ll.lat, ll.lng])(map.containerPointToLatLng([x, y])));
+  };
+  btn.addEventListener('pointerup', end);
+  btn.addEventListener('pointercancel', end);
+  $('#sv-cancel').onclick = () => svMode(false);
+})();
 
 // ---------- roles ----------
 async function getNames(ids) {
