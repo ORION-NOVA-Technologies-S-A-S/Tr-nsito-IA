@@ -86,7 +86,7 @@ button{cursor:pointer;border:0;background:none;padding:0}
 #app{position:fixed;inset:0;display:grid;grid-template-columns:1fr;grid-template-rows:1fr var(--nav-h);grid-template-areas:"main" "nav"}
 #mapwrap{grid-area:main;position:relative;min-height:0}
 #map{position:absolute;inset:0;background:#e9eef5}
-#panel{grid-area:main;z-index:1000;background:var(--bg);overflow-y:auto;min-height:0}
+#panel{grid-area:main;z-index:1000;background:var(--bg);overflow-y:auto;overflow-x:hidden;min-height:0;min-width:0}
 #nav{grid-area:nav;z-index:1100;display:flex;background:#fff;border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
 #app{grid-template-rows:1fr calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
 #nav button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;position:relative}
@@ -267,9 +267,12 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .ctrl.drive[aria-pressed="true"]{background:#0B1B4D;color:#38BDF8}
 .ctrl .lock{position:absolute;right:-4px;top:-4px;background:linear-gradient(135deg,#1E5EFF,#38BDF8);color:#fff;border-radius:999px;font-size:9px;font-weight:800;padding:2px 5px;letter-spacing:.4px}
 .ctrl{position:relative}
-.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.set-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.set-grid > div{min-width:0}
+.set-grid .field{width:100%}
+.set-grid input{width:100%}
 .set-grid .full{grid-column:1 / -1}
-textarea.ta{width:100%;min-height:90px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font:inherit;font-size:14px;resize:vertical;background:#fff;color:var(--text)}
+textarea.ta{display:block;width:100%;max-width:100%;min-height:120px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font:inherit;font-size:14px;resize:vertical;background:#fff;color:var(--text)}
 .dialog select,.adm-body select{height:42px;border-radius:10px;border:1px solid var(--border);background:#fff;padding:0 10px;font:inherit;font-size:13px}
 /* Panel admin */
 .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
