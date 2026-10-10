@@ -860,7 +860,9 @@ function subscribe() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, scheduleReload)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'report_votes' }, scheduleReload)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'report_comments' }, scheduleReload)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'plan_requests' }, () => { loadPlan(); if (S.tab === 'admin' && S.adm === 'planes') renderAdmin(true); else if (S.isAdmin) countPending(); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'plan_requests' }, ev => {
+      if (S.isAdmin && ev && ev.eventType === 'INSERT' && ev.new && ev.new.user_id !== S.session.user.id) adminPaymentAlert(ev.new);
+      loadPlan(); if (S.tab === 'admin' && S.adm === 'planes') renderAdmin(true); else if (S.isAdmin) countPending(); })
     .subscribe();
 }
 async function toggleVote(r) {
@@ -1519,8 +1521,10 @@ function requestPlan(plan) {
     if (ref.length < 3) return msg(m, 'Escribe la referencia del pago para que podamos confirmarlo.');
     const btn = $('#q-send'); busy(btn, true);
     const row = { plan, months, company_name: company, nit: plan === 'empresa' ? ($('#q-nit').value.trim() || null) : null, contact_phone: phone, payment_ref: ref };
-    let { error } = await sb.from('plan_requests').insert(row);
-    if (error && /months/i.test(error.message || '')) { delete row.months; ({ error } = await sb.from('plan_requests').insert(row)); } // base sin finanzas.sql
+    let { data: created, error } = await sb.from('plan_requests').insert(row).select('id').single();
+    if (error && /months/i.test(error.message || '')) { delete row.months; ({ data: created, error } = await sb.from('plan_requests').insert(row).select('id').single()); } // base sin finanzas.sql
+    // Aviso al administrador por WhatsApp y correo (no bloquea al usuario si falla)
+    if (!error && created) sb.functions.invoke('notify-admin', { body: { request_id: created.id } }).catch(() => {});
     busy(btn, false);
     if (error) return msg(m, friendly(error));
     root.innerHTML = '';
@@ -1627,6 +1631,18 @@ function stopDrive() {
 $('#btn-drive').onclick = () => S.driving ? stopDrive() : startDrive();
 $('#drive-stop').onclick = stopDrive;
 
+// Alerta en la app para el administrador cuando llega un pago
+function adminPaymentAlert(r) {
+  beep(); setTimeout(beep, 350);
+  try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (_) {}
+  const plan = r.plan === 'empresa' ? 'Empresa' : 'Plus';
+  toast(`💰 Nuevo pago por revisar: plan ${plan}${r.amount ? ' · ' + cop(r.amount) : ''}${r.payment_ref ? ' · ref. ' + r.payment_ref : ''}. Ve a Admin → Planes.`);
+  try {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Nuevo pago por revisar', { body: `Plan ${plan}${r.amount ? ' · ' + cop(r.amount) : ''}. Revisa tu Nequi o banco y apruébalo.`, icon: 'img/icon-192.png' });
+    }
+  } catch (_) {}
+}
 // ----- Admin > Planes -----
 async function countPending() {
   const { data } = await sb.rpc('admin_list_requests');
@@ -1634,6 +1650,7 @@ async function countPending() {
   const b = $('#adm-planes-btn'); if (b) b.textContent = n ? `Planes (${n})` : 'Planes';
 }
 async function admPlanes(body) {
+  try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (_) {}
   const [rq, subs, st] = await Promise.all([sb.rpc('admin_list_requests'), sb.rpc('admin_list_subscriptions'), sb.from('app_settings').select('*').eq('id', 1).maybeSingle()]);
   if (rq.error) throw rq.error;
   const reqs = rq.data || [], pend = reqs.filter(r => r.status === 'pendiente'), done = reqs.filter(r => r.status !== 'pendiente').slice(0, 15);
