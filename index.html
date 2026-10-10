@@ -361,6 +361,64 @@ textarea.ta{display:block;width:100%;max-width:100%;min-height:120px;border:1px 
   .sheet .grab{display:none}
   #toast{bottom:24px}
 }
+/* Meses en la solicitud */
+.months{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 4px}
+.mopt{border:2px solid var(--border);border-radius:12px;padding:10px;text-align:left;background:#fff;display:flex;flex-direction:column;gap:2px;position:relative}
+.mopt[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft)}
+.mopt b{font-size:14px}
+.mopt .tot{font-size:16px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
+.mopt .save{font-size:11.5px;font-weight:700;color:var(--ok)}
+.mopt .off{position:absolute;top:8px;right:8px;background:var(--ok);color:#fff;border-radius:6px;font-size:10.5px;font-weight:800;padding:1px 6px}
+.plan-now.soon{border:2px solid #F59E0B}
+.plan-now.soon span{color:#92400E}
+/* Finanzas */
+.fin-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.fin-filters select{height:40px;border-radius:10px;border:1px solid var(--border);background:#fff;padding:0 10px;font:inherit;font-size:13.5px;color:var(--navy);font-weight:600}
+.fin-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.fin-actions .btn{width:auto;flex:1 1 160px;height:44px;font-size:14px}
+.kpi small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.chart{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:14px 12px 10px}
+.chart h4{margin:0 0 2px;font-size:14px}
+.chart .sub{color:var(--muted);font-size:12px;margin-bottom:10px}
+.cplot{position:relative;height:150px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;align-items:end;border-bottom:1px solid #CBD5E1;padding-top:16px}
+.cplot .gl{position:absolute;left:0;right:0;border-top:1px dashed #E5E9F2;pointer-events:none}
+.cplot .gl span{position:absolute;right:0;top:-14px;font-size:10px;color:var(--muted);background:#fff;padding-left:3px;font-variant-numeric:tabular-nums}
+.cbar{position:relative;height:100%;display:flex;align-items:flex-end;justify-content:center;cursor:default}
+.cbar i{display:block;width:72%;max-width:26px;background:var(--primary);border-radius:4px 4px 0 0;min-height:0;transition:filter .15s}
+.cbar.zero i{background:transparent}
+.cbar:hover i,.cbar:focus i{filter:brightness(1.15)}
+.cbar.cur i{background:var(--navy)}
+.cbar .tip{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:3px 6px;white-space:nowrap;display:none;z-index:2;font-variant-numeric:tabular-nums}
+.cbar:hover .tip,.cbar:focus .tip{display:block}
+.cbar .lbl{position:absolute;bottom:calc(100% + 2px);font-size:10px;font-weight:700;color:var(--navy);white-space:nowrap;font-variant-numeric:tabular-nums}
+.cx{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;margin-top:4px}
+.cx span{text-align:center;font-size:10.5px;color:var(--muted);text-transform:capitalize}
+.tbl-wrap{overflow-x:auto;background:#fff;border-radius:14px;box-shadow:var(--shadow)}
+table.fin{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
+table.fin th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:10px;border-bottom:1px solid var(--border);white-space:nowrap}
+table.fin td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+table.fin td:nth-child(3){min-width:130px}
+table.fin td:nth-child(4){min-width:190px}
+table.fin td:nth-child(5){min-width:120px}
+table.fin td.n,table.fin th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.fin tr.void td{color:#94A3B8;text-decoration:line-through}
+table.fin tr.void td.keep{text-decoration:none}
+table.fin tfoot td{font-weight:800;border-bottom:0}
+.legal{font-size:11.5px;color:var(--muted);margin:10px 2px 0;line-height:1.45}
+#print-area{display:none}
+.rcpt{max-width:720px;margin:0 auto;padding:32px;font-family:var(--font);color:#111}
+.rcpt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid #0B1B4D;padding-bottom:14px}
+.rcpt-head img{width:64px;height:64px;border-radius:12px}
+.rcpt h1{font-size:20px;margin:0}
+.rcpt table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+.rcpt td,.rcpt th{border-bottom:1px solid #ddd;padding:8px;text-align:left}
+.rcpt .tot{font-size:18px;font-weight:800}
+.rcpt .void{color:#B42318;font-weight:800;font-size:22px;border:3px solid #B42318;display:inline-block;padding:4px 12px;transform:rotate(-4deg);margin-top:12px}
+@media print{
+  #app,#auth,#modal-root,#toast{display:none!important}
+  #print-area{display:block!important}
+  html,body{height:auto;overflow:visible;background:#fff}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -546,6 +604,7 @@ textarea.ta{display:block;width:100%;max-width:100%;min-height:120px;border:1px 
           <button data-adm="usuarios" aria-pressed="false">Usuarios</button>
           <button data-adm="comentarios" aria-pressed="false">Comentarios</button>
           <button data-adm="planes" aria-pressed="false" id="adm-planes-btn">Planes</button>
+          <button data-adm="finanzas" aria-pressed="false">Finanzas</button>
         </div>
       </div>
       <div class="panel-body" id="adm-body"><div class="empty"><span class="spin dark" style="display:inline-block"></span></div></div>
@@ -554,6 +613,7 @@ textarea.ta{display:block;width:100%;max-width:100%;min-height:120px;border:1px 
 </div>
 
 <div id="modal-root"></div>
+<div id="print-area"></div>
 <div id="toast" role="status" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1337,6 +1397,15 @@ function applyRole() {
 const PLAN_NAMES = { gratis: 'Gratis', plus: 'Plus', empresa: 'Empresa' };
 const cop = n => '$' + Number(n || 0).toLocaleString('es-CO');
 const fmtDate = d => new Date(d).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+const MONTH_OPTS = [1, 3, 6, 12];
+function quote(plan, months) {
+  const st = S.settings || {};
+  const unit = (plan === 'empresa' ? st.empresa_price : st.plus_price) || 0;
+  const disc = months === 3 ? (st.disc_3 ?? 5) : months === 6 ? (st.disc_6 ?? 10) : months === 12 ? (st.disc_12 ?? 15) : 0;
+  const amount = Math.round(unit * months * (100 - disc) / 100);
+  return { unit, disc, amount, full: unit * months, save: unit * months - amount };
+}
+const daysLeft = d => d ? Math.ceil((new Date(d).getTime() - Date.now()) / 864e5) : null;
 const hasPlus = () => S.myPlan.plan === 'plus' || S.myPlan.plan === 'empresa';
 const nearKm = () => hasPlus() ? NEAR_KM_PLUS : NEAR_KM_FREE;
 let myRequests = [];
@@ -1359,13 +1428,17 @@ async function loadPlan() {
 function applyPlan() {
   const mp = S.myPlan, pl = mp.plan || 'gratis';
   const pn = $('#plan-now');
-  pn.className = 'plan-now ' + pl;
+  const left = pl !== 'gratis' ? daysLeft(mp.plan_until) : null;
+  const soon = left != null && left <= 3;
+  pn.className = 'plan-now ' + pl + (soon ? ' soon' : '');
+  if (soon && !S.warnedExpiry) { S.warnedExpiry = true; setTimeout(() => toast(left <= 0 ? 'Tu plan vence hoy. Renuévalo en Perfil → Planes.' : `Tu plan vence en ${left} día${left === 1 ? '' : 's'}. Renuévalo en Perfil → Planes.`), 1500); }
   const pending = myRequests.find(r => r.status === 'pendiente');
   const sub = pl === 'gratis'
     ? (pending ? `Solicitud de ${PLAN_NAMES[pending.plan]} en revisión` : 'Mejora a Plus: avisos por voz al conducir')
+    : soon ? `⚠ Vence ${left <= 0 ? 'hoy' : `en ${left} día${left === 1 ? '' : 's'}`} (${fmtDate(mp.plan_until)}) · ${mp.plan === 'empresa' && !mp.is_owner ? 'avísale al dueño de tu empresa' : 'renuévalo para no perder los beneficios'}`
     : pl === 'empresa' ? `${esc(mp.company_name || 'Tu empresa')} · hasta el ${fmtDate(mp.plan_until)}` : `Activo hasta el ${fmtDate(mp.plan_until)}`;
   pn.innerHTML = `<span class="ic"><i class="mdi mdi-${pl === 'gratis' ? 'star-outline' : pl === 'plus' ? 'star-four-points' : 'domain'}"></i></span>
-    <span class="info"><b>Plan ${PLAN_NAMES[pl]}</b><span>${sub}</span></span><span class="go">${pl === 'gratis' ? 'Mejorar' : 'Ver plan'} <i class="mdi mdi-chevron-right"></i></span>`;
+    <span class="info"><b>Plan ${PLAN_NAMES[pl]}</b><span>${sub}</span></span><span class="go">${pl === 'gratis' ? 'Mejorar' : soon ? 'Renovar' : 'Ver plan'} <i class="mdi mdi-chevron-right"></i></span>`;
   $('#drive-lock').hidden = hasPlus();
   const pp = $('#p-plan'); pp.hidden = pl === 'gratis'; pp.className = 'pchip ' + pl; pp.innerHTML = pl === 'plus' ? '<i class="mdi mdi-star-four-points"></i>Plus' : '<i class="mdi mdi-domain"></i>Empresa';
   $('#seg-cerca').textContent = `Cerca de mí (${nearKm()} km)`;
@@ -1392,7 +1465,9 @@ function renderPlanes() {
   if (!S.plansReady) head = `<div class="notice"><i class="mdi mdi-progress-wrench"></i><span>Los planes se están activando. Muy pronto podrás solicitarlos.</span></div>`;
   else if (pending) head = `<div class="notice" style="background:#EAF0FF;color:#1747C7"><i class="mdi mdi-timer-sand"></i><span><b>Tu solicitud de plan ${PLAN_NAMES[pending.plan]} está en revisión.</b><br>Enviada ${timeAgo(pending.created_at).toLowerCase()}. Te activaremos el plan cuando confirmemos el pago.</span></div>`;
   else if (lastRejected && myRequests[0] === lastRejected) head = `<div class="notice"><i class="mdi mdi-alert-circle-outline"></i><span><b>Tu última solicitud no fue aprobada.</b>${lastRejected.admin_note ? '<br>' + esc(lastRejected.admin_note) : ''}</span></div>`;
-  if (cur !== 'gratis') head += `<div class="notice" style="background:#E8F7EE;color:#14532D"><i class="mdi mdi-check-decagram"></i><span><b>Tienes el plan ${PLAN_NAMES[cur]}</b> activo hasta el ${fmtDate(S.myPlan.plan_until)}. Puedes renovarlo antes de que venza y se suma el tiempo.</span></div>`;
+  const lft = cur !== 'gratis' ? daysLeft(S.myPlan.plan_until) : null;
+  if (lft != null && lft <= 3) head += `<div class="notice"><i class="mdi mdi-calendar-alert"></i><span><b>Tu plan ${PLAN_NAMES[cur]} vence ${lft <= 0 ? 'hoy' : `en ${lft} día${lft === 1 ? '' : 's'}`}.</b> Renuévalo para no perder los beneficios.</span></div>`;
+  else if (cur !== 'gratis') head += `<div class="notice" style="background:#E8F7EE;color:#14532D"><i class="mdi mdi-check-decagram"></i><span><b>Tienes el plan ${PLAN_NAMES[cur]}</b> activo hasta el ${fmtDate(S.myPlan.plan_until)}. Puedes renovarlo antes de que venza y se suma el tiempo.</span></div>`;
   body.innerHTML = head + `<div class="plans">${planFeatures().map(p => {
     const isCur = p.key === cur, best = p.key === 'plus' && cur === 'gratis';
     const btn = p.key === 'gratis' ? (isCur ? '<button class="btn outline" disabled>Tu plan actual</button>' : '')
@@ -1400,6 +1475,7 @@ function renderPlanes() {
     return `<div class="plan ${isCur ? 'current' : best ? 'best' : ''}">${isCur ? '<span class="ribbon">Tu plan</span>' : best ? '<span class="ribbon">Recomendado</span>' : ''}
       <h3><i class="mdi mdi-${p.icon}" style="color:var(--primary)"></i>${p.title}</h3>
       <div class="price">${p.price ? cop(p.price) : '$0'}<small> / mes</small></div>
+      ${p.key !== 'gratis' && quote(p.key, 12).disc ? `<div style="color:var(--ok);font-weight:700;font-size:13px;margin-top:-2px">Paga 12 meses y ahorra ${quote(p.key, 12).disc} %</div>` : ''}
       <p class="who">${esc(p.who)}</p>
       <ul>${p.items.map(i => `<li><i class="mdi mdi-check-circle"></i><span>${esc(i)}</span></li>`).join('')}</ul>${btn}</div>`;
   }).join('')}</div>
@@ -1408,13 +1484,17 @@ function renderPlanes() {
 }
 function requestPlan(plan) {
   const st = S.settings || {};
-  const price = plan === 'plus' ? st.plus_price : st.empresa_price;
+  let months = 1;
   const root = $('#modal-root');
   root.innerHTML = `<div class="sheet-bg" style="align-items:center"><form class="dialog wide" id="req-form" role="dialog" aria-modal="true" novalidate>
-    <h3>Solicitar plan ${PLAN_NAMES[plan]} · ${cop(price)} / mes</h3>
-    <p style="margin-bottom:10px">1. Paga el valor del plan así:</p>
+    <h3>Solicitar plan ${PLAN_NAMES[plan]}</h3>
+    <p style="margin-bottom:0">1. Elige por cuánto tiempo:</p>
+    <div class="months" id="q-months">${MONTH_OPTS.map(n => { const q = quote(plan, n); return `<button type="button" class="mopt" data-m="${n}" aria-pressed="${n === 1}">
+      ${q.disc ? `<span class="off">-${q.disc}%</span>` : ''}<b>${n} ${n === 1 ? 'mes' : 'meses'}</b><span class="tot">${cop(q.amount)}</span>
+      <span class="save">${q.save ? 'Ahorras ' + cop(q.save) : cop(q.unit) + ' / mes'}</span></button>`; }).join('')}</div>
+    <p style="margin:12px 0 8px">2. Paga <b id="q-total">${cop(quote(plan, 1).amount)}</b> así:</p>
     <div class="pay-box">${esc(st.pay_instructions || 'El administrador aún no ha configurado los datos de pago.')}</div>
-    <p style="margin-bottom:0">2. Llena estos datos y envía la solicitud:</p>
+    <p style="margin-bottom:0">3. Llena estos datos y envía la solicitud:</p>
     ${plan === 'empresa' ? `<label class="lbl" for="q-company">Nombre de la empresa</label><div class="field"><input id="q-company" maxlength="120" placeholder="Ej: Mensajería Rápida SAS"></div>
     <label class="lbl" for="q-nit">NIT (para la factura)</label><div class="field"><input id="q-nit" maxlength="30" placeholder="Ej: 901234567-8"></div>` : ''}
     <label class="lbl" for="q-phone">Celular de contacto</label><div class="field"><input id="q-phone" type="tel" maxlength="20" value="${esc((S.profile && S.profile.phone) || '')}" placeholder="Ej: 3001234567"></div>
@@ -1423,6 +1503,12 @@ function requestPlan(plan) {
     <div class="row2" style="margin-top:16px"><button type="button" class="btn outline" id="q-cancel">Cancelar</button><button class="btn" id="q-send">Enviar solicitud</button></div>
   </form></div>`;
   $('#q-cancel').onclick = () => { root.innerHTML = ''; };
+  $('#q-months').addEventListener('click', e => {
+    const b = e.target.closest('[data-m]'); if (!b) return;
+    months = +b.dataset.m;
+    $$('#q-months .mopt').forEach(x => x.setAttribute('aria-pressed', x === b));
+    $('#q-total').textContent = cop(quote(plan, months).amount);
+  });
   $('#req-form').addEventListener('submit', async e => {
     e.preventDefault();
     const m = $('#q-msg');
@@ -1432,9 +1518,9 @@ function requestPlan(plan) {
     if (phone.length < 7) return msg(m, 'Escribe un celular de contacto.');
     if (ref.length < 3) return msg(m, 'Escribe la referencia del pago para que podamos confirmarlo.');
     const btn = $('#q-send'); busy(btn, true);
-    const { error } = await sb.from('plan_requests').insert({
-      plan, company_name: company, nit: plan === 'empresa' ? ($('#q-nit').value.trim() || null) : null, contact_phone: phone, payment_ref: ref,
-    });
+    const row = { plan, months, company_name: company, nit: plan === 'empresa' ? ($('#q-nit').value.trim() || null) : null, contact_phone: phone, payment_ref: ref };
+    let { error } = await sb.from('plan_requests').insert(row);
+    if (error && /months/i.test(error.message || '')) { delete row.months; ({ error } = await sb.from('plan_requests').insert(row)); } // base sin finanzas.sql
     busy(btn, false);
     if (error) return msg(m, friendly(error));
     root.innerHTML = '';
@@ -1559,8 +1645,8 @@ async function admPlanes(body) {
   const reqRow = r => `<div class="arow"><span class="pchip ${r.plan}" style="flex:none;margin-top:2px">${PLAN_NAMES[r.plan]}</span><div class="info">
       <div class="t">${esc(r.plan === 'empresa' ? (r.company_name || 'Empresa') : (r.full_name || r.email))}</div>
       <div class="s">${esc(r.email)}${r.contact_phone ? ' · ' + esc(r.contact_phone) : ''}${r.nit ? ' · NIT ' + esc(r.nit) : ''}</div>
-      <div class="m">Pago: <b>${esc(r.payment_ref || '—')}</b> · ${timeAgo(r.created_at).toLowerCase()}${r.status !== 'pendiente' ? ' · ' + (r.status === 'aprobada' ? '✅ aprobada' : '❌ rechazada') : ''}</div>
-      ${r.status === 'pendiente' ? `<div class="acts"><select id="m-${r.id}" aria-label="Meses"><option value="1">1 mes</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">12 meses</option></select>
+      <div class="m">${r.months ? `<b>${r.months} ${r.months == 1 ? 'mes' : 'meses'}</b>${r.amount != null ? ' · <b>' + cop(r.amount) + '</b>' : ''} · ` : ''}Pago: <b>${esc(r.payment_ref || '—')}</b> · ${timeAgo(r.created_at).toLowerCase()}${r.status !== 'pendiente' ? ' · ' + (r.status === 'aprobada' ? '✅ aprobada' : '❌ rechazada') : ''}</div>
+      ${r.status === 'pendiente' ? `<div class="acts"><select id="m-${r.id}" aria-label="Meses">${MONTH_OPTS.map(n => `<option value="${n}" ${n === (r.months || 1) ? 'selected' : ''}>${n} ${n === 1 ? 'mes' : 'meses'}</option>`).join('')}</select>
         <button class="sbtn" data-appr="${r.id}" style="color:var(--ok);border-color:#BBE5C8"><i class="mdi mdi-check-circle-outline"></i>Aprobar</button>
         <button class="sbtn red" data-rej="${r.id}"><i class="mdi mdi-close-circle-outline"></i>Rechazar</button></div>` : ''}
     </div></div>`;
@@ -1588,6 +1674,12 @@ async function admPlanes(body) {
         <div><label class="lbl" for="s-plus" style="font-size:13px;font-weight:700;color:var(--navy)">Plus (COP/mes)</label><div class="field"><input id="s-plus" type="number" min="0" step="100" value="${set.plus_price || 0}"></div></div>
         <div><label class="lbl" for="s-emp" style="font-size:13px;font-weight:700;color:var(--navy)">Empresa (COP/mes)</label><div class="field"><input id="s-emp" type="number" min="0" step="100" value="${set.empresa_price || 0}"></div></div>
         <div><label class="lbl" for="s-seats" style="font-size:13px;font-weight:700;color:var(--navy)">Cupos Empresa</label><div class="field"><input id="s-seats" type="number" min="1" max="500" value="${set.empresa_seats || 10}"></div></div>
+        ${'disc_3' in set ? `<div><label class="lbl" for="s-d3" style="font-size:13px;font-weight:700;color:var(--navy)">Descuento 3 meses (%)</label><div class="field"><input id="s-d3" type="number" min="0" max="90" value="${set.disc_3}"></div></div>
+        <div><label class="lbl" for="s-d6" style="font-size:13px;font-weight:700;color:var(--navy)">Descuento 6 meses (%)</label><div class="field"><input id="s-d6" type="number" min="0" max="90" value="${set.disc_6}"></div></div>
+        <div><label class="lbl" for="s-d12" style="font-size:13px;font-weight:700;color:var(--navy)">Descuento 12 meses (%)</label><div class="field"><input id="s-d12" type="number" min="0" max="90" value="${set.disc_12}"></div></div>
+        <div class="full"><label class="lbl" for="s-bn" style="font-size:13px;font-weight:700;color:var(--navy)">Empresa que emite los recibos</label><div class="field"><input id="s-bn" maxlength="120" value="${esc(set.biz_name || '')}"></div></div>
+        <div><label class="lbl" for="s-bnit" style="font-size:13px;font-weight:700;color:var(--navy)">NIT</label><div class="field"><input id="s-bnit" maxlength="30" value="${esc(set.biz_nit || '')}"></div></div>
+        <div><label class="lbl" for="s-bcity" style="font-size:13px;font-weight:700;color:var(--navy)">Ciudad</label><div class="field"><input id="s-bcity" maxlength="60" value="${esc(set.biz_city || '')}"></div></div>` : ''}
         <div class="full"><label class="lbl" for="s-pay" style="font-size:13px;font-weight:700;color:var(--navy)">Instrucciones de pago (las ve el usuario)</label>
           <textarea class="ta" id="s-pay" maxlength="800" placeholder="Ej: Nequi 300 123 4567 a nombre de Orion Nova Technologies. Bancolombia ahorros 123-456789-00.">${esc(set.pay_instructions || '')}</textarea></div>
       </div>
@@ -1597,7 +1689,9 @@ async function admPlanes(body) {
     <div class="list">${done.map(reqRow).join('') || '<div class="empty">Nada por aquí todavía.</div>'}</div>`;
   $$('[data-appr]', body).forEach(b => b.onclick = async () => {
     const months = +$('#m-' + b.dataset.appr).value;
-    if (!await confirmBox({ title: 'Aprobar plan', text: `¿Ya confirmaste el pago? El plan se activará por ${months} mes${months > 1 ? 'es' : ''}.`, ok: 'Aprobar' })) return;
+    const rq0 = reqs.find(x => x.id === b.dataset.appr) || {};
+    const val = rq0.amount != null && months === rq0.months ? rq0.amount : quote(rq0.plan, months).amount;
+    if (!await confirmBox({ title: 'Aprobar plan', text: `¿Ya confirmaste que te llegaron ${cop(val)}? El plan se activará por ${months} mes${months > 1 ? 'es' : ''} y el pago quedará registrado en Finanzas.`, ok: 'Aprobar' })) return;
     const { error } = await sb.rpc('admin_approve_request', { req: b.dataset.appr, months });
     if (error) return toast(friendly(error));
     toast('Plan activado.'); renderAdmin(true);
@@ -1618,9 +1712,205 @@ async function admPlanes(body) {
     e.preventDefault();
     const upd = { plus_price: Math.max(0, +$('#s-plus').value || 0), empresa_price: Math.max(0, +$('#s-emp').value || 0),
       empresa_seats: Math.min(500, Math.max(1, +$('#s-seats').value || 10)), pay_instructions: $('#s-pay').value.trim(), updated_at: new Date().toISOString() };
+    if ($('#s-d3')) {
+      const pct = id => Math.min(90, Math.max(0, Math.round(+$(id).value || 0)));
+      Object.assign(upd, { disc_3: pct('#s-d3'), disc_6: pct('#s-d6'), disc_12: pct('#s-d12'),
+        biz_name: $('#s-bn').value.trim() || 'Orion Nova Technologies', biz_nit: $('#s-bnit').value.trim() || null, biz_city: $('#s-bcity').value.trim() || 'Neiva, Huila' });
+    }
     const { error } = await sb.from('app_settings').update(upd).eq('id', 1);
     if (error) return toast(friendly(error));
     toast('Precios y datos de pago guardados.'); loadPlan();
+  });
+}
+
+// ----- Admin > Finanzas -----
+const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const MESES_L = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const PLAN_FIN = { plus: 'Plus', empresa: 'Empresa', otro: 'Otro ingreso' };
+const fdate = d => d ? new Date(d).toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+S.fin = { year: new Date().getFullYear(), month: 'todos' };
+let finRows = [];
+async function admFinanzas(body) {
+  const y = S.fin.year;
+  const from = new Date(y, 0, 1).toISOString(), to = new Date(y + 1, 0, 1).toISOString();
+  const [pq, aq, st] = await Promise.all([
+    sb.from('payments').select('*').gte('paid_at', from).lt('paid_at', to).order('paid_at', { ascending: false }).limit(2000),
+    sb.from('payments').select('amount, months, period_end').eq('status', 'valido').gt('period_end', new Date().toISOString()).limit(2000),
+    sb.from('app_settings').select('*').eq('id', 1).maybeSingle(),
+  ]);
+  if (pq.error) {
+    if (/payments|relation|schema cache/i.test(pq.error.message || '')) {
+      body.innerHTML = `<div class="notice"><i class="mdi mdi-progress-wrench"></i><span><b>Falta activar Finanzas.</b><br>Ejecuta el archivo <b>finanzas.sql</b> en el SQL Editor de Supabase y recarga.</span></div>`;
+      return;
+    }
+    throw pq.error;
+  }
+  S.settings = Object.assign({}, S.settings, st.data || {});
+  const all = pq.data || [];
+  const inMonth = r => S.fin.month === 'todos' || new Date(r.paid_at).getMonth() === +S.fin.month;
+  finRows = all.filter(inMonth);
+  const valid = finRows.filter(r => r.status === 'valido');
+  const voided = finRows.filter(r => r.status === 'anulado');
+  const total = valid.reduce((a, r) => a + r.amount, 0);
+  const mrr = Math.round((aq.data || []).reduce((a, r) => a + r.amount / Math.max(1, r.months), 0));
+  const byMonth = Array(12).fill(0);
+  all.filter(r => r.status === 'valido').forEach(r => { byMonth[new Date(r.paid_at).getMonth()] += r.amount; });
+  const max = Math.max(...byMonth);
+  const nice = v => { if (v <= 0) return 100000; const e = Math.pow(10, Math.floor(Math.log10(v))); const f = v / e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * e; };
+  const top = nice(max);
+  const short = v => v >= 1e6 ? (v / 1e6).toLocaleString('es-CO', { maximumFractionDigits: 1 }) + ' M' : v >= 1e3 ? Math.round(v / 1e3) + ' mil' : String(v);
+  const maxIdx = max > 0 ? byMonth.indexOf(max) : -1;
+  const byPlan = { plus: 0, empresa: 0, otro: 0 };
+  valid.forEach(r => { byPlan[r.plan] = (byPlan[r.plan] || 0) + r.amount; });
+  const years = []; for (let k = new Date().getFullYear(); k >= 2026; k--) years.push(k);
+  if (!years.includes(y)) years.push(y);
+  const periodo = S.fin.month === 'todos' ? `Año ${y}` : `${MESES_L[+S.fin.month]} ${y}`;
+  body.innerHTML = `
+    <div class="fin-filters">
+      <select id="fin-y" aria-label="Año">${years.map(k => `<option ${k === y ? 'selected' : ''}>${k}</option>`).join('')}</select>
+      <select id="fin-m" aria-label="Mes"><option value="todos">Todo el año</option>${MESES_L.map((m, i) => `<option value="${i}" ${String(i) === String(S.fin.month) ? 'selected' : ''}>${m}</option>`).join('')}</select>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><b>${cop(total)}</b><span>Ingresos · ${periodo}</span></div>
+      <div class="kpi"><b>${valid.length}</b><span>Pagos registrados</span>${voided.length ? `<small>${voided.length} anulado${voided.length === 1 ? '' : 's'} (no suman)</small>` : ''}</div>
+      <div class="kpi"><b>${cop(valid.length ? Math.round(total / valid.length) : 0)}</b><span>Valor promedio por pago</span></div>
+      <div class="kpi"><b>${cop(mrr)}</b><span>Ingreso mensual recurrente</span><small>Promedio mensual de los planes vigentes hoy</small></div>
+    </div>
+    <div class="sec-head"><h3>Ingresos por mes</h3></div>
+    <div class="chart">
+      <h4>${y} · pagos válidos por fecha de pago</h4><div class="sub">Pasa el dedo o el mouse por una barra para ver el valor</div>
+      <div class="cplot" role="img" aria-label="Ingresos por mes de ${y}">
+        <div class="gl" style="bottom:50%"><span>${short(top / 2)}</span></div><div class="gl" style="bottom:100%"><span>${short(top)}</span></div>
+        ${byMonth.map((v, i) => `<div class="cbar ${v ? '' : 'zero'}" tabindex="0" aria-label="${MESES_L[i]}: ${cop(v)}">
+          <i style="height:${v ? Math.max(2, v / top * 100) : 0}%"></i>${i === maxIdx ? `<span class="lbl" style="bottom:calc(${v / top * 100}% + 2px)">${short(v)}</span>` : ''}<span class="tip">${MESES_L[i]}: ${cop(v)}</span></div>`).join('')}
+      </div>
+      <div class="cx">${MESES.map(m => `<span>${m}</span>`).join('')}</div>
+    </div>
+    <div class="sec-head"><h3>Por tipo de ingreso · ${periodo}</h3></div>
+    <div class="bars">${Object.keys(byPlan).map(k => `<div class="bar" style="grid-template-columns:76px minmax(0,1fr) 40px"><span class="pchip ${k === 'otro' ? '' : k}" style="justify-self:start">${PLAN_FIN[k].split(' ')[0]}</span>
+      <div><div style="margin-bottom:4px">${PLAN_FIN[k]} · ${cop(byPlan[k])}</div><div class="track"><div class="fill" style="width:${total ? byPlan[k] / total * 100 : 0}%;background:${k === 'plus' ? '#1E5EFF' : k === 'empresa' ? '#0B1B4D' : '#94A3B8'}"></div></div></div>
+      <span class="n">${total ? Math.round(byPlan[k] / total * 100) : 0}%</span></div>`).join('')}</div>
+    <div class="fin-actions">
+      <button class="btn" id="fin-add"><i class="mdi mdi-cash-plus"></i>Registrar pago manual</button>
+      <button class="btn outline" id="fin-csv"><i class="mdi mdi-microsoft-excel"></i>Exportar a Excel (CSV)</button>
+    </div>
+    <div class="sec-head" style="padding-top:6px"><h3>Libro de pagos · ${periodo}</h3><span style="color:var(--muted);font-size:13px">${finRows.length} registro${finRows.length === 1 ? '' : 's'}</span></div>
+    <div class="tbl-wrap"><table class="fin">
+      <thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th>Concepto</th><th>Método / ref.</th><th class="n">Valor</th><th></th></tr></thead>
+      <tbody>${finRows.map(r => `<tr class="${r.status === 'anulado' ? 'void' : ''}">
+        <td>${r.number}</td><td>${fdate(r.paid_at)}</td>
+        <td>${esc(r.customer_name)}${r.customer_doc ? `<br><small style="color:var(--muted)">NIT/CC ${esc(r.customer_doc)}</small>` : ''}</td>
+        <td>${esc(r.concept)}${r.discount_pct ? ` <small style="color:var(--ok)">(-${r.discount_pct}%)</small>` : ''}${r.status === 'anulado' ? `<br><small class="keep" style="color:#B42318;text-decoration:none">Anulado: ${esc(r.void_reason || '')}</small>` : ''}</td>
+        <td>${esc(r.method)}${r.payment_ref ? `<br><small style="color:var(--muted)">${esc(r.payment_ref)}</small>` : ''}</td>
+        <td class="n">${cop(r.amount)}</td>
+        <td class="keep" style="white-space:nowrap"><button class="sbtn" data-rcpt="${r.id}" title="Ver o imprimir el comprobante"><i class="mdi mdi-receipt-text-outline"></i>Recibo</button>
+          ${r.status === 'valido' ? `<button class="sbtn red" data-void="${r.id}" title="Anular (queda en el registro)"><i class="mdi mdi-cancel"></i></button>` : ''}</td></tr>`).join('')
+        || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No hay pagos en ${periodo.toLowerCase()}. Cuando apruebes un plan, el pago aparecerá aquí.</td></tr>`}</tbody>
+      ${finRows.length ? `<tfoot><tr><td colspan="5">Total válido</td><td class="n">${cop(total)}</td><td></td></tr></tfoot>` : ''}
+    </table></div>
+    <p class="legal">Cada plan que apruebas queda registrado aquí con número consecutivo. Los errores no se borran: se anulan y quedan visibles con su motivo, como pide un registro contable. Este libro y sus recibos son un soporte interno y <b>no reemplazan la factura electrónica de la DIAN</b>. Consulta con tu contador cómo facturar y declarar estos ingresos.</p>`;
+  $('#fin-y').onchange = e => { S.fin.year = +e.target.value; renderAdmin(); };
+  $('#fin-m').onchange = e => { S.fin.month = e.target.value; renderAdmin(); };
+  $('#fin-csv').onclick = () => exportCSV(periodo);
+  $('#fin-add').onclick = addPaymentDialog;
+  $$('[data-rcpt]', body).forEach(b => b.onclick = () => showReceipt(finRows.find(r => r.id === b.dataset.rcpt)));
+  $$('[data-void]', body).forEach(b => b.onclick = () => voidDialog(finRows.find(r => r.id === b.dataset.void)));
+}
+function exportCSV(periodo) {
+  const cols = [['Numero', r => r.number], ['Fecha de pago', r => fdate(r.paid_at)], ['Cliente', r => r.customer_name], ['NIT/CC', r => r.customer_doc],
+    ['Correo', r => r.customer_email], ['Tipo', r => PLAN_FIN[r.plan] || r.plan], ['Concepto', r => r.concept], ['Meses', r => r.months],
+    ['Valor mensual', r => r.unit_price], ['Descuento %', r => r.discount_pct], ['Valor pagado', r => r.amount], ['Metodo', r => r.method],
+    ['Referencia', r => r.payment_ref], ['Inicio del periodo', r => fdate(r.period_start)], ['Fin del periodo', r => fdate(r.period_end)],
+    ['Estado', r => r.status], ['Motivo anulacion', r => r.void_reason], ['Notas', r => r.notes]];
+  const cell = v => { const t = v == null ? '' : String(v); return /[";\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+  const lines = [cols.map(c => c[0]).join(';'), ...finRows.slice().reverse().map(r => cols.map(c => cell(c[1](r))).join(';'))];
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `alerta-transito-ingresos-${periodo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-')}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('Archivo descargado. Ábrelo con Excel.');
+}
+function showReceipt(r) {
+  if (!r) return;
+  const st = S.settings || {};
+  const html = `<div class="rcpt">
+    <div class="rcpt-head"><div style="display:flex;gap:12px;align-items:center"><img src="img/icon-192.png" alt="">
+      <div><h1>${esc(st.biz_name || 'Orion Nova Technologies')}</h1><div style="font-size:13px;color:#555">${st.biz_nit ? 'NIT ' + esc(st.biz_nit) + ' · ' : ''}${esc(st.biz_city || '')}<br>Alerta Tránsito</div></div></div>
+      <div style="text-align:right"><div style="font-size:12px;color:#555">COMPROBANTE DE PAGO</div><div style="font-size:24px;font-weight:800">N° ${r.number}</div><div style="font-size:13px">${fdate(r.paid_at)}</div></div></div>
+    <table>
+      <tr><th style="width:34%">Cliente</th><td>${esc(r.customer_name)}</td></tr>
+      ${r.customer_doc ? `<tr><th>NIT / Cédula</th><td>${esc(r.customer_doc)}</td></tr>` : ''}
+      ${r.customer_email ? `<tr><th>Correo</th><td>${esc(r.customer_email)}</td></tr>` : ''}
+      <tr><th>Concepto</th><td>${esc(r.concept)}</td></tr>
+      ${r.period_start ? `<tr><th>Periodo</th><td>${fdate(r.period_start)} al ${fdate(r.period_end)}</td></tr>` : ''}
+      <tr><th>Valor mensual</th><td>${cop(r.unit_price)} × ${r.months} ${r.months == 1 ? 'mes' : 'meses'}</td></tr>
+      ${r.discount_pct ? `<tr><th>Descuento</th><td>${r.discount_pct} %</td></tr>` : ''}
+      <tr><th>Método de pago</th><td>${esc(r.method)}${r.payment_ref ? ' · Ref. ' + esc(r.payment_ref) : ''}</td></tr>
+      <tr><th class="tot">Total pagado</th><td class="tot">${cop(r.amount)} COP</td></tr>
+    </table>
+    ${r.status === 'anulado' ? `<div class="void">ANULADO</div><p style="font-size:13px">Motivo: ${esc(r.void_reason || '')}</p>` : ''}
+    <p style="font-size:11.5px;color:#666;margin-top:28px">Documento soporte interno generado por Alerta Tránsito. No es una factura electrónica de venta.</p></div>`;
+  $('#print-area').innerHTML = html;
+  $('#modal-root').innerHTML = `<div class="sheet-bg" style="align-items:center" id="rc-bg"><div class="dialog wide" style="max-width:620px;padding:0" role="dialog" aria-modal="true">
+    <div style="max-height:62vh;overflow:auto">${html}</div>
+    <div class="row2" style="padding:14px 16px;border-top:1px solid var(--border)"><button class="btn outline" id="rc-close">Cerrar</button><button class="btn" id="rc-print"><i class="mdi mdi-printer-outline"></i>Imprimir o guardar PDF</button></div></div></div>`;
+  $('#rc-close').onclick = () => { $('#modal-root').innerHTML = ''; };
+  $('#rc-bg').addEventListener('click', e => { if (e.target.id === 'rc-bg') $('#modal-root').innerHTML = ''; });
+  $('#rc-print').onclick = () => window.print();
+}
+function voidDialog(r) {
+  if (!r) return;
+  $('#modal-root').innerHTML = `<div class="sheet-bg" style="align-items:center"><form class="dialog" id="vd-form" novalidate>
+    <h3>Anular pago N° ${r.number}</h3><p>${esc(r.customer_name)} · ${cop(r.amount)}. El pago queda en el libro marcado como anulado y deja de sumar. No desactiva el plan del usuario.</p>
+    <div class="field"><input id="vd-reason" maxlength="300" placeholder="Motivo (ej: pago duplicado, error en el valor)"></div>
+    <div id="vd-msg" hidden style="margin-top:10px"></div>
+    <div class="row2" style="margin-top:14px"><button type="button" class="btn outline" id="vd-cancel">Cancelar</button><button class="btn danger">Anular</button></div></form></div>`;
+  $('#vd-cancel').onclick = () => { $('#modal-root').innerHTML = ''; };
+  $('#vd-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const reason = $('#vd-reason').value.trim();
+    if (reason.length < 3) return msg($('#vd-msg'), 'Escribe el motivo de la anulación.');
+    const { error } = await sb.rpc('admin_void_payment', { p_id: r.id, p_reason: reason });
+    if (error) return msg($('#vd-msg'), friendly(error));
+    $('#modal-root').innerHTML = ''; toast(`Pago N° ${r.number} anulado.`); renderAdmin(true);
+  });
+}
+function addPaymentDialog() {
+  const today = new Date(); const iso = new Date(today.getTime() - today.getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
+  $('#modal-root').innerHTML = `<div class="sheet-bg" style="align-items:center"><form class="dialog wide" id="ap-form" novalidate>
+    <h3>Registrar pago manual</h3><p style="margin-bottom:4px">Para ingresos que no llegaron por una solicitud de la app: efectivo, patrocinios, ajustes. No activa planes.</p>
+    <label class="lbl" for="ap-name">Cliente</label><div class="field"><input id="ap-name" maxlength="120" placeholder="Nombre o razón social"></div>
+    <div class="set-grid">
+      <div><label class="lbl" for="ap-doc">NIT / Cédula</label><div class="field"><input id="ap-doc" maxlength="30"></div></div>
+      <div><label class="lbl" for="ap-email">Correo</label><div class="field"><input id="ap-email" type="email" maxlength="120"></div></div>
+      <div><label class="lbl" for="ap-type">Tipo</label><select id="ap-type" style="width:100%;height:46px"><option value="otro">Otro ingreso</option><option value="plus">Plus</option><option value="empresa">Empresa</option></select></div>
+      <div><label class="lbl" for="ap-months">Meses</label><div class="field"><input id="ap-months" type="number" min="1" max="24" value="1"></div></div>
+      <div class="full"><label class="lbl" for="ap-concept">Concepto</label><div class="field"><input id="ap-concept" maxlength="160" placeholder="Ej: Patrocinio en el mapa · octubre"></div></div>
+      <div><label class="lbl" for="ap-amount">Valor (COP)</label><div class="field"><input id="ap-amount" type="number" min="0" step="100" placeholder="150000"></div></div>
+      <div><label class="lbl" for="ap-date">Fecha de pago</label><div class="field"><input id="ap-date" type="date" value="${iso}"></div></div>
+      <div><label class="lbl" for="ap-method">Método</label><select id="ap-method" style="width:100%;height:46px"><option>Efectivo</option><option>Nequi</option><option>Transferencia</option><option>Daviplata</option><option>PSE</option><option>Otro</option></select></div>
+      <div><label class="lbl" for="ap-ref">Referencia</label><div class="field"><input id="ap-ref" maxlength="120"></div></div>
+      <div class="full"><label class="lbl" for="ap-notes">Notas</label><div class="field"><input id="ap-notes" maxlength="300"></div></div>
+    </div>
+    <div id="ap-msg" hidden style="margin-top:10px"></div>
+    <div class="row2" style="margin-top:14px"><button type="button" class="btn outline" id="ap-cancel">Cancelar</button><button class="btn" id="ap-save">Registrar</button></div></form></div>`;
+  $('#ap-cancel').onclick = () => { $('#modal-root').innerHTML = ''; };
+  $('#ap-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const m = $('#ap-msg'), name = $('#ap-name').value.trim(), amount = Math.round(+$('#ap-amount').value);
+    if (name.length < 2) return msg(m, 'Escribe el nombre del cliente.');
+    if (!(amount > 0)) return msg(m, 'Escribe el valor recibido.');
+    const btn = $('#ap-save'); busy(btn, true);
+    const { data, error } = await sb.rpc('admin_add_payment', {
+      p_customer: name, p_email: $('#ap-email').value.trim(), p_doc: $('#ap-doc').value.trim(), p_plan: $('#ap-type').value,
+      p_concept: $('#ap-concept').value.trim(), p_months: Math.max(1, Math.round(+$('#ap-months').value || 1)), p_amount: amount,
+      p_method: $('#ap-method').value, p_ref: $('#ap-ref').value.trim(), p_paid_at: new Date($('#ap-date').value + 'T12:00:00').toISOString(), p_notes: $('#ap-notes').value.trim(),
+    });
+    busy(btn, false);
+    if (error) return msg(m, friendly(error));
+    $('#modal-root').innerHTML = ''; toast(`Pago N° ${data} registrado.`); renderAdmin(true);
   });
 }
 
@@ -1642,6 +1932,7 @@ async function renderAdmin(silent) {
     else if (S.adm === 'reportes') await admReportes(body);
     else if (S.adm === 'usuarios') await admUsuarios(body);
     else if (S.adm === 'planes') await admPlanes(body);
+    else if (S.adm === 'finanzas') await admFinanzas(body);
     else await admComentarios(body);
   } catch (err) {
     body.innerHTML = `<div class="notice"><i class="mdi mdi-alert-circle-outline"></i><span>${esc(friendly(err))}</span></div>`;

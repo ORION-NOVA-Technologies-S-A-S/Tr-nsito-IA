@@ -24,6 +24,15 @@ Versión web de Alerta Tránsito. Es una comunidad que reporta fotomultas, reten
 - **Empresa** ($89.900/mes): Plus para hasta 10 conductores y panel "Mi empresa".
 - El cobro es manual: el usuario paga, envía la referencia y el admin aprueba en **Admin → Planes**, donde también se editan precios y datos de pago.
 
+5. **SQL Editor**: pega `finanzas.sql` y dale **Run**. Así se activan los meses con descuento y el registro financiero.
+
+## Finanzas (Admin → Finanzas)
+
+- Cada plan aprobado queda registrado en un libro de pagos con número consecutivo (desde el 1001).
+- Muestra los ingresos del mes o del año, una gráfica por mes, los ingresos por tipo y el ingreso mensual recurrente.
+- Tiene recibo imprimible o en PDF, exportación a Excel (CSV), registro de pagos manuales y anulaciones con motivo. Los pagos nunca se borran.
+- Es un soporte interno: no reemplaza la factura electrónica de la DIAN.
+
 ## Roles
 
 - **Comunidad**: publica reportes, confirma alertas ("Sigue ahí") y comenta. Su celular solo lo ve el administrador.
