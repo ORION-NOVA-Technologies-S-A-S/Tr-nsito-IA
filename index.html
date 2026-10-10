@@ -126,6 +126,18 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .sv-ghost i{font-size:46px;color:#FFB300;text-shadow:0 0 0 #000,0 2px 6px rgba(0,0,0,.45);-webkit-text-stroke:1.5px #3B2600}
 .sv-ghost span{width:14px;height:6px;border-radius:50%;background:rgba(0,0,0,.35);margin-top:-4px}
 .sv-drop{font-size:40px;color:#FFB300;-webkit-text-stroke:1.5px #3B2600;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+#sv-view{position:absolute;inset:0;z-index:950;background:#0b0f1a;display:flex;flex-direction:column}
+#sv-pano{flex:1;min-height:0}
+.sv-head{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;background:#fff;box-shadow:var(--shadow);z-index:2}
+.sv-head .t{flex:1;min-width:0}
+.sv-head b{display:block;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-head small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-head .round{flex:none}
+.sv-msg{position:absolute;inset:60px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#E2E8F0;text-align:center;padding:24px}
+.sv-msg > i{font-size:52px;color:#FFB300}
+.sv-msg .btn{width:auto;padding:0 18px;height:44px;font-size:14px;text-decoration:none}
+.sv-msg .btn i{font-size:18px}
+@media (min-width:900px){.sv-head{padding-top:12px}}
 .empty-badge{position:absolute;left:16px;right:76px;bottom:28px;z-index:900;background:rgba(255,255,255,.95);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);font-size:13px;font-weight:600;color:var(--navy);max-width:420px}
 
 /* Marcadores */
@@ -361,6 +373,16 @@ button{cursor:pointer;border:0;background:none;padding:0}
       </form>
       <div class="chips" id="chips"></div>
     </div>
+    <div id="sv-view" hidden role="dialog" aria-label="Vista de calle">
+      <div class="sv-head">
+        <span class="ctrl sv" style="width:40px;height:40px;font-size:24px;box-shadow:none;cursor:default"><i class="mdi mdi-human-handsdown"></i></span>
+        <div class="t"><b id="sv-title">Vista de calle</b><small id="sv-sub">Buscando la calle más cercana…</small></div>
+        <a class="round" id="sv-ext" target="_blank" rel="noopener" aria-label="Abrir en Google Maps" title="Abrir en Google Maps"><i class="mdi mdi-open-in-new"></i></a>
+        <button class="round" id="sv-close" aria-label="Cerrar vista de calle"><i class="mdi mdi-close"></i></button>
+      </div>
+      <div id="sv-pano"></div>
+      <div class="sv-msg" id="sv-msg" hidden></div>
+    </div>
     <div class="map-ctrl">
       <button class="ctrl sv" id="btn-sv" aria-pressed="false" aria-label="Ver la calle: arrastra el muñeco al mapa o tócalo y luego toca un punto" title="Arrástrame al mapa para ver la calle"><i class="mdi mdi-human-handsdown"></i></button>
       <button class="ctrl" id="btn-me" aria-label="Mi ubicación"><i class="mdi mdi-crosshairs-gps"></i></button>
@@ -464,6 +486,9 @@ const SUPABASE_URL = 'https://hgwzuhizruwsdbditsai.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnd3p1aGl6cnV3c2RiZGl0c2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTM2NTIsImV4cCI6MjEwNzEyOTY1Mn0.QDPKrTzyT1zXkse821iror6YfEv74yqGeh1z3C-pklU'; // clave pública (anon); la seguridad la dan las políticas RLS
 const DEFAULT_CENTER = [4.6533, -74.0836]; // Bogotá
 const NEAR_KM = 5;
+// Clave de Google Maps (Maps JavaScript API) para ver la calle dentro de la app.
+// Restríngela en Google Cloud a: https://orion-nova-technologies-s-a-s.github.io/*
+const GOOGLE_MAPS_KEY = '';
 
 const TYPES = [
   { key: 'agente',         label: 'Agente de tránsito', chip: 'Agente',         icon: 'police-badge',   color: '#1E5EFF' },
@@ -778,13 +803,14 @@ async function refreshDetail() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
         <button class="btn ${r.voted_by_me ? '' : 'outline'}" id="d-vote" style="height:46px;font-size:15px"><i class="mdi mdi-thumb-up${r.voted_by_me ? '' : '-outline'}"></i>${r.voted_by_me ? 'Confirmado' : 'Sigue ahí'} · ${r.votes}</button>
         <a class="btn outline" style="height:46px;font-size:15px;text-decoration:none" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"><i class="mdi mdi-directions"></i>Cómo llegar</a>
-        <a class="btn outline" style="height:46px;font-size:15px;text-decoration:none;grid-column:1 / -1" target="_blank" rel="noopener" href="${streetUrl([r.lat, r.lng])}"><i class="mdi mdi-human-handsdown" style="color:#E09A00"></i>Ver la calle</a>
+        <button class="btn outline" id="d-street" style="height:46px;font-size:15px;grid-column:1 / -1"><i class="mdi mdi-human-handsdown" style="color:#E09A00"></i>Ver la calle</button>
       </div></div>
     <div style="font-weight:800;padding:16px 16px 8px">Comentarios (${list.length})</div>
     ${list.length ? list.map(c => `<div class="comment">${(S.isAdmin || c.user_id === S.session.user.id) ? `<button class="c-del" data-cdel="${c.id}" aria-label="Eliminar comentario"><i class="mdi mdi-trash-can-outline"></i></button>` : ''}<b>${esc(names[c.user_id] || 'Usuario')}</b><p>${esc(c.body)}</p><small>${timeAgo(c.created_at)}</small></div>`).join('')
       : '<p style="color:var(--muted);padding:0 16px 16px;margin:0">Sé el primero en comentar.</p>'}
     <div style="height:8px"></div>`;
   $('#d-close').onclick = closeDetail;
+  $('#d-street').onclick = () => { closeDetail(); if (!isDesk()) setTab('mapa'); openStreet([r.lat, r.lng], r.address); };
   $('#compose').hidden = S.blocked;
   $$('[data-cdel]', box).forEach(b => b.onclick = async () => {
     const { error } = await sb.from('report_comments').delete().eq('id', b.dataset.cdel);
@@ -813,6 +839,7 @@ function setTab(tab) {
   if (tab === 'alertas') { S.unseen = 0; renderBadge(); }
   if (tab === 'perfil') loadProfile();
   if (tab === 'mapa' && map) setTimeout(() => map.invalidateSize(), 50);
+  if (!isDesk() && tab !== 'mapa' && !$('#sv-view').hidden) closeStreet();
   $('#panel').scrollTop = 0;
 }
 $('#nav').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) setTab(b.dataset.tab); });
@@ -1025,15 +1052,75 @@ $('#reset-form').addEventListener('submit', async e => {
 // ---------- muñeco: vista de calle ----------
 function streetUrl(ll) { return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${ll[0].toFixed(6)},${ll[1].toFixed(6)}`; }
 let svMarker;
-function openStreet(ll) {
-  if (svMarker) map.removeLayer(svMarker);
-  svMarker = L.marker(ll, { interactive: false, icon: L.divIcon({ className: '', html: '<i class="mdi mdi-human-handsdown sv-drop"></i>', iconSize: [40, 40], iconAnchor: [20, 38] }) }).addTo(map);
-  setTimeout(() => { if (svMarker) { map.removeLayer(svMarker); svMarker = null; } }, 6000);
-  const a = document.createElement('a');
-  a.href = streetUrl(ll); a.target = '_blank'; a.rel = 'noopener';
-  document.body.appendChild(a); a.click(); a.remove();
-  toast('Abriendo la vista de calle en Google Maps…');
+// Carga la API de Google Maps solo cuando se usa el muñeco
+let gmLoading;
+function loadGoogle() {
+  if (window.google && google.maps && google.maps.StreetViewPanorama) return Promise.resolve();
+  if (gmLoading) return gmLoading;
+  gmLoading = new Promise((res, rej) => {
+    window.__gmReady = () => res();
+    window.gm_authFailure = () => { svFail('key'); };
+    const sc = document.createElement('script');
+    sc.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(GOOGLE_MAPS_KEY)}&v=weekly&libraries=geometry&language=es&region=CO&callback=__gmReady&loading=async`;
+    sc.async = true; sc.onerror = () => { gmLoading = null; rej(new Error('Failed to fetch')); };
+    document.head.appendChild(sc);
+  });
+  return gmLoading;
 }
+let pano, svService;
+function svShowMsg(html) { const m = $('#sv-msg'); m.innerHTML = html; m.hidden = false; $('#sv-pano').style.visibility = 'hidden'; }
+function svFail(kind, ll) {
+  const ext = ll ? `<a class="btn" target="_blank" rel="noopener" href="${streetUrl(ll)}"><i class="mdi mdi-open-in-new"></i>Abrir en Google Maps</a>` : '';
+  $('#sv-sub').textContent = '';
+  if (kind === 'nopano') svShowMsg(`<i class="mdi mdi-image-off-outline"></i><div><b>No hay vista de calle en este punto</b><br>Arrastra el muñeco sobre una calle principal.</div>`);
+  else if (kind === 'key') svShowMsg(`<i class="mdi mdi-key-alert-outline"></i><div><b>La vista de calle aún no está activada</b><br>Falta configurar la clave de Google Maps de la app.</div>${ext}`);
+  else svShowMsg(`<i class="mdi mdi-wifi-off"></i><div><b>No se pudo cargar la vista de calle</b><br>Revisa tu conexión e inténtalo de nuevo.</div>${ext}`);
+}
+function placeSvMarker(ll) {
+  if (svMarker) svMarker.setLatLng(ll);
+  else svMarker = L.marker(ll, { interactive: false, zIndexOffset: 1000, icon: L.divIcon({ className: '', html: '<i class="mdi mdi-human-handsdown sv-drop"></i>', iconSize: [40, 40], iconAnchor: [20, 38] }) }).addTo(map);
+}
+async function openStreet(ll, label) {
+  placeSvMarker(ll);
+  const v = $('#sv-view');
+  v.hidden = false; $('#sv-msg').hidden = true; $('#sv-pano').style.visibility = 'visible';
+  $('#sv-title').textContent = label || 'Vista de calle';
+  $('#sv-sub').textContent = 'Buscando la calle más cercana…';
+  $('#sv-ext').href = streetUrl(ll);
+  if (!label) reverse(ll).then(a => { if (a && !v.hidden) $('#sv-title').textContent = a; });
+  if (!GOOGLE_MAPS_KEY) return svFail('key', ll);
+  try { await loadGoogle(); } catch (e) { return svFail('net', ll); }
+  if (!svService) svService = new google.maps.StreetViewService();
+  svService.getPanorama({ location: { lat: ll[0], lng: ll[1] }, radius: 60, preference: google.maps.StreetViewPreference.NEAREST, sources: [google.maps.StreetViewSource.OUTDOOR] }, (data, status) => {
+    if (v.hidden) return;
+    if (status !== google.maps.StreetViewStatus.OK) return svFail('nopano', ll);
+    const pos = data.location.latLng;
+    // mirar hacia el punto que el usuario eligió
+    const heading = google.maps.geometry && google.maps.geometry.spherical
+      ? google.maps.geometry.spherical.computeHeading(pos, new google.maps.LatLng(ll[0], ll[1])) : 0;
+    const opts = { pano: data.location.pano, pov: { heading: isFinite(heading) ? heading : 0, pitch: 0 }, zoom: 0,
+      addressControl: false, fullscreenControl: false, motionTracking: false, motionTrackingControl: false, enableCloseButton: false, showRoadLabels: true };
+    if (!pano) {
+      pano = new google.maps.StreetViewPanorama($('#sv-pano'), opts);
+      pano.addListener('position_changed', () => {
+        const p = pano.getPosition(); if (!p) return;
+        placeSvMarker([p.lat(), p.lng()]);
+        $('#sv-ext').href = streetUrl([p.lat(), p.lng()]);
+      });
+    } else { pano.setOptions(opts); }
+    pano.setVisible(true);
+    const d = data.imageDate ? data.imageDate.split('-') : null;
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    $('#sv-sub').textContent = d ? `Foto de ${meses[+d[1] - 1] || ''} ${d[0]} · arrastra para mirar, toca las flechas para avanzar` : 'Arrastra para mirar, toca las flechas para avanzar';
+  });
+}
+function closeStreet() {
+  $('#sv-view').hidden = true;
+  if (pano) pano.setVisible(false);
+  if (svMarker) { map.removeLayer(svMarker); svMarker = null; }
+}
+$('#sv-close').onclick = closeStreet;
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sv-view').hidden) closeStreet(); });
 function svMode(on) {
   S.svMode = on;
   if (on) { if (S.picking) stopPick(); select(null); }
