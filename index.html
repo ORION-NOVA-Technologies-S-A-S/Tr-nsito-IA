@@ -156,6 +156,28 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .grid6{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .tile{background:#fff;border-radius:var(--radius);border:2px solid transparent;box-shadow:var(--shadow);aspect-ratio:1/0.92;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;font-size:12.5px;font-weight:700;text-align:center;line-height:1.2}
 .tile[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft)}
+.tile[data-type="via_libre"]{grid-column:1 / -1;aspect-ratio:auto;flex-direction:row;justify-content:flex-start;gap:12px;padding:12px 14px;font-size:14px;text-align:left}
+.tile[data-type="via_libre"][aria-pressed="true"]{border-color:#16A34A;background:#E8F7EE}
+.tile .sub{display:block;font-weight:500;color:var(--muted);font-size:12px}
+/* insignia de vía libre en el mapa */
+.free{position:relative;width:200px;height:56px}
+.free .badge-in{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;max-width:200px;background:#16A34A;color:#fff;border:2px solid #fff;border-radius:14px;padding:5px 10px 5px 6px;box-shadow:0 3px 10px rgba(11,27,77,.3);white-space:nowrap}
+.free .badge-in i{font-size:24px;line-height:1}
+.free b{display:block;font-size:12px;font-weight:800;letter-spacing:.2px;line-height:1.15}
+.free small{display:block;font-size:11px;opacity:.92;max-width:150px;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.free.new .badge-in{animation:pop2 .5s ease-out}
+@keyframes pop2{0%{transform:translateX(-50%) scale(.3)}70%{transform:translateX(-50%) scale(1.1)}100%{transform:translateX(-50%) scale(1)}}
+.free .tip2{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid #16A34A}
+/* insignia de mi zona */
+.zone{margin-top:10px;display:flex;align-items:center;gap:10px;width:100%;text-align:left;border-radius:12px;padding:8px 12px;font-size:13px;line-height:1.3}
+.zone i{font-size:26px;flex:none}
+.zone b{display:block;font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zone span{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zone .txt{flex:1;min-width:0}
+.zone.free-z{background:#E8F7EE;color:#14532D;border:1px solid #BBE5C8}
+.zone.free-z i{color:#16A34A}
+.zone.busy{background:#FDECEC;color:#8A1C1C;border:1px solid #F5C2C0}
+.zone.busy i{color:#E53935}
 .card{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:14px;margin-top:14px}
 .card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .card-head h3{margin:0;font-size:18px;font-weight:800}
@@ -372,6 +394,7 @@ button{cursor:pointer;border:0;background:none;padding:0}
         <span id="search-spin" class="spin dark" hidden></span>
       </form>
       <div class="chips" id="chips"></div>
+      <button class="zone" id="zone" hidden></button>
     </div>
     <div id="sv-view" hidden role="dialog" aria-label="Vista de calle">
       <div class="sv-head">
@@ -497,8 +520,11 @@ const TYPES = [
   { key: 'foto_multa',     label: 'Foto multas',        chip: 'Foto multas',    icon: 'camera',         color: '#8E24AA' },
   { key: 'reten_transito', label: 'Retén de tránsito',  chip: 'Retén tránsito', icon: 'boom-gate',      color: '#F4511E' },
   { key: 'reten_policia',  label: 'Retén de policía',   chip: 'Retén policía',  icon: 'shield-account', color: '#1A237E' },
+  { key: 'via_libre',      label: 'Libre de agentes',   chip: 'Libre de agentes', icon: 'check-decagram', color: '#16A34A' },
 ];
 const T = Object.fromEntries(TYPES.map(t => [t.key, t]));
+const AGENT_TYPES = ['agente', 'reten_transito', 'reten_policia', 'control'];
+const ZONE_KM = 1;
 
 if (!window.supabase || !window.L) {
   document.body.innerHTML = '<div style="padding:32px 20px;font-family:system-ui;text-align:center;color:#0B1B4D"><h2>No se pudo cargar Alerta Tránsito</h2><p>Revisa tu conexión a internet y recarga la página.</p><button onclick="location.reload()" style="margin-top:12px;padding:12px 20px;border-radius:10px;border:0;background:#1E5EFF;color:#fff;font-weight:700">Recargar</button></div>';
@@ -554,6 +580,7 @@ function friendly(e) {
   if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Sin conexión a internet. Revisa tu red.';
   if (/row-level security|violates row-level/i.test(m)) return S.blocked ? 'Tu cuenta está bloqueada. No puedes publicar.' : 'No tienes permiso para hacer esto.';
   if (/Solo para administradores/i.test(m)) return 'Esta acción es solo para administradores.';
+  if (/invalid input value for enum|report_type/i.test(m)) return 'El tipo "Libre de agentes" aún no está activado en la base de datos. Ejecuta el SQL de vía libre en Supabase.';
   if (/delete_my_account/i.test(m)) return 'La eliminación automática aún no está activa. Escríbenos y la hacemos por ti.';
   if (/could not find the function|schema cache/i.test(m)) return 'Falta activar esta función en la base de datos: ejecuta roles_admin.sql en Supabase.';
   return m || 'Ocurrió un error inesperado.';
@@ -607,7 +634,7 @@ function locate() {
   return new Promise(res => {
     if (!navigator.geolocation) return res(null);
     navigator.geolocation.getCurrentPosition(
-      p => { S.me = [p.coords.latitude, p.coords.longitude]; drawMe(); res(S.me); },
+      p => { S.me = [p.coords.latitude, p.coords.longitude]; drawMe(); renderZone(); res(S.me); },
       () => res(null),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
@@ -636,6 +663,13 @@ function drawMe() {
 }
 function pinIcon(r, isNew) {
   const t = T[r.type] || T.agente;
+  if (r.type === 'via_libre') {
+    return L.divIcon({
+      className: '',
+      html: `<div class="free${isNew ? ' new' : ''}"><div class="badge-in"><i class="mdi mdi-check-decagram"></i><div><b>LIBRE DE AGENTES</b><small>${esc(r.address)}</small></div></div><div class="tip2"></div></div>`,
+      iconSize: [200, 56], iconAnchor: [100, 56],
+    });
+  }
   return L.divIcon({
     className: '',
     html: `<div class="pin${isNew ? ' new' : ''}"><div class="ring">${ticon(r.type, 34)}</div><div class="tip" style="border-top-color:${t.color}"></div></div>`,
@@ -695,6 +729,7 @@ async function loadReports() {
   if (S.selected && !S.reports.find(r => r.id === S.selected)) select(null); else if (S.selected) select(S.selected);
   renderLists();
   renderBadge();
+  renderZone();
   if (S.detailId) refreshDetail();
   if (S.tab === 'admin' && S.adm !== 'usuarios') renderAdmin(true);
 }
@@ -857,7 +892,7 @@ $('#chips').addEventListener('click', e => {
   if (!isDesk()) setTab('mapa');
 });
 function renderTypes() {
-  $('#types').innerHTML = TYPES.map(t => `<button type="button" class="tile" data-type="${t.key}" aria-pressed="${S.type === t.key}">${ticon(t.key, 46)}<span>${esc(t.label)}</span></button>`).join('');
+  $('#types').innerHTML = TYPES.map(t => `<button type="button" class="tile" data-type="${t.key}" aria-pressed="${S.type === t.key}">${ticon(t.key, 46)}<span>${esc(t.label)}${t.key === 'via_libre' ? '<span class="sub">Avisa que en esta dirección no hay agentes ni retenes</span>' : ''}</span></button>`).join('');
   $('#sel-icon').innerHTML = ticon(S.type, 48, true);
   $('#sel-label').textContent = T[S.type].label;
 }
@@ -1048,6 +1083,52 @@ $('#reset-form').addEventListener('submit', async e => {
   recovering = false; enterApp();
   toast('Contraseña actualizada.');
 });
+
+// ---------- insignia de mi zona (libre de agentes) ----------
+let zoneAddr = { ll: null, text: '' }, zoneTarget = null;
+async function zoneAddress() {
+  if (zoneAddr.ll && km(zoneAddr.ll, S.me) < 0.2) return zoneAddr.text;
+  const ll = S.me.slice();
+  const text = await reverse(ll);
+  zoneAddr = { ll, text };
+  return text;
+}
+async function renderZone() {
+  const z = $('#zone');
+  if (!S.me || !S.loadedOnce) { z.hidden = true; return; }
+  const near = S.reports
+    .map(r => ({ r, k: km(S.me, [r.lat, r.lng]) }))
+    .filter(x => x.k != null && x.k <= ZONE_KM)
+    .sort((a, b) => a.k - b.k);
+  const agents = near.filter(x => AGENT_TYPES.includes(x.r.type));
+  const free = near.find(x => x.r.type === 'via_libre');
+  if (agents.length) {
+    zoneTarget = agents[0].r;
+    z.className = 'zone busy';
+    z.innerHTML = `<i class="mdi mdi-police-badge"></i><span class="txt"><b>Agentes cerca · ${agents.length} ${agents.length === 1 ? 'reporte' : 'reportes'} a 1 km</b><span>${esc(T[zoneTarget.type].label)} a ${fmtKm(agents[0].k)} · ${esc(zoneTarget.address)}</span></span><i class="mdi mdi-chevron-right" style="font-size:22px"></i>`;
+  } else {
+    zoneTarget = free ? free.r : null;
+    z.className = 'zone free-z';
+    const addr = free ? free.r.address : (await zoneAddress()) || 'Tu ubicación';
+    if (!S.me || S.reports.some(r => AGENT_TYPES.includes(r.type) && km(S.me, [r.lat, r.lng]) <= ZONE_KM)) return; // cambió mientras buscaba la dirección
+    z.innerHTML = `<i class="mdi mdi-check-decagram"></i><span class="txt"><b>Libre de agentes de tránsito</b><span>${esc(addr)} · sin reportes a 1 km${free ? ' · confirmado por la comunidad' : ''}</span></span>`;
+  }
+  z.hidden = false;
+}
+$('#zone').onclick = () => {
+  if (zoneTarget) { if (!isDesk()) setTab('mapa'); flyTo([zoneTarget.lat, zoneTarget.lng], 16); select(zoneTarget.id); }
+  else if (S.me) flyTo(S.me, 16);
+};
+// seguir la ubicación mientras la app está abierta (para la insignia de zona)
+let watchId = null;
+function watchMe() {
+  if (watchId != null || !navigator.geolocation) return;
+  let last = 0;
+  watchId = navigator.geolocation.watchPosition(p => {
+    const now = Date.now(); if (now - last < 15000) return; last = now;
+    S.me = [p.coords.latitude, p.coords.longitude]; drawMe(); renderZone();
+  }, () => {}, { enableHighAccuracy: true, maximumAge: 30000 });
+}
 
 // ---------- muñeco: vista de calle ----------
 function streetUrl(ll) { return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${ll[0].toFixed(6)},${ll[1].toFixed(6)}`; }
@@ -1373,7 +1454,7 @@ function enterApp() {
     started = true;
     initMap(); renderChips(); renderTypes();
     setTab(isDesk() ? 'reportar' : 'mapa');
-    locate().then(ll => { if (ll) map.setView(ll, 14); renderLists(); });
+    locate().then(ll => { if (ll) { map.setView(ll, 14); watchMe(); } renderLists(); });
     loadMe(); loadReports(); subscribe();
     setInterval(() => { loadReports(); }, 60000); // los reportes vencidos desaparecen
   } else {
