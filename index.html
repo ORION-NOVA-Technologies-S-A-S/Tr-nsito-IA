@@ -1476,6 +1476,7 @@ async function loadPlan() {
   if (S.tab === 'planes') renderPlanes();
   if (S.tab === 'perfil') renderCompany();
   if (S.isAdmin) countPending();
+  resumeWompi();
 }
 function applyPlan() {
   const mp = S.myPlan, pl = mp.plan || 'gratis';
@@ -1534,43 +1535,98 @@ function renderPlanes() {
   <p class="foot">Precios en pesos colombianos, IVA incluido si aplica. El plan se activa cuando confirmamos tu pago.</p>`;
   $$('[data-want]', body).forEach(b => b.onclick = () => requestPlan(b.dataset.want));
 }
-function requestPlan(plan) {
+const TX_RE = /^[A-Za-z0-9_-]{5,80}$/;
+const PENDING_PAY = 'alerta.pendingPay';
+function savePending(v) { try { localStorage.setItem(PENDING_PAY, JSON.stringify({ ...v, t: Date.now() })); } catch (_) {} }
+function readPending() { try { const v = JSON.parse(localStorage.getItem(PENDING_PAY) || 'null'); return v && Date.now() - v.t < 6 * 36e5 ? v : null; } catch (_) { return null; } }
+function clearPending() { try { localStorage.removeItem(PENDING_PAY); } catch (_) {} }
+function requestPlan(plan, pre = {}) {
   const st = S.settings || {};
-  let months = 1;
+  const hasWompi = !!st.wompi_link_url;
+  let months = MONTH_OPTS.includes(pre.months) ? pre.months : 1;
+  let method = hasWompi ? 'wompi' : 'manual';
   const root = $('#modal-root');
   root.innerHTML = `<div class="sheet-bg" style="align-items:center"><form class="dialog wide" id="req-form" role="dialog" aria-modal="true" novalidate>
-    <h3>Solicitar plan ${PLAN_NAMES[plan]}</h3>
+    <h3>Plan ${PLAN_NAMES[plan]}</h3>
     <p style="margin-bottom:0">1. Elige por cuánto tiempo:</p>
-    <div class="months" id="q-months">${MONTH_OPTS.map(n => { const q = quote(plan, n); return `<button type="button" class="mopt" data-m="${n}" aria-pressed="${n === 1}">
+    <div class="months" id="q-months">${MONTH_OPTS.map(n => { const q = quote(plan, n); return `<button type="button" class="mopt" data-m="${n}" aria-pressed="${n === months}">
       ${q.disc ? `<span class="off">-${q.disc}%</span>` : ''}<b>${n} ${n === 1 ? 'mes' : 'meses'}</b><span class="tot">${cop(q.amount)}</span>
       <span class="save">${q.save ? 'Ahorras ' + cop(q.save) : cop(q.unit) + ' / mes'}</span></button>`; }).join('')}</div>
-    <p style="margin:12px 0 8px">2. Paga <b id="q-total">${cop(quote(plan, 1).amount)}</b> así:</p>
-    <div class="pay-box">${esc(st.pay_instructions || 'El administrador aún no ha configurado los datos de pago.')}</div>
-    <p style="margin-bottom:0">3. Llena estos datos y envía la solicitud:</p>
-    ${plan === 'empresa' ? `<label class="lbl" for="q-company">Nombre de la empresa</label><div class="field"><input id="q-company" maxlength="120" placeholder="Ej: Mensajería Rápida SAS"></div>
-    <label class="lbl" for="q-nit">NIT (para la factura)</label><div class="field"><input id="q-nit" maxlength="30" placeholder="Ej: 901234567-8"></div>` : ''}
-    <label class="lbl" for="q-phone">Celular de contacto</label><div class="field"><input id="q-phone" type="tel" maxlength="20" value="${esc((S.profile && S.profile.phone) || '')}" placeholder="Ej: 3001234567"></div>
-    <label class="lbl" for="q-ref">Número o referencia del pago</label><div class="field"><input id="q-ref" maxlength="120" placeholder="Ej: M1234567 o comprobante Nequi"></div>
+    <p style="margin:12px 0 0">2. Tus datos:</p>
+    ${plan === 'empresa' ? `<label class="lbl" for="q-company">Nombre de la empresa</label><div class="field"><input id="q-company" maxlength="120" placeholder="Ej: Mensajería Rápida SAS" value="${esc(pre.company || '')}"></div>
+    <label class="lbl" for="q-nit">NIT (para la factura)</label><div class="field"><input id="q-nit" maxlength="30" placeholder="Ej: 901234567-8" value="${esc(pre.nit || '')}"></div>` : ''}
+    <label class="lbl" for="q-phone">Celular de contacto</label><div class="field"><input id="q-phone" type="tel" maxlength="20" value="${esc(pre.phone || (S.profile && S.profile.phone) || '')}" placeholder="Ej: 3001234567"></div>
+    <p style="margin:14px 0 8px">3. Paga <b id="q-total">${cop(quote(plan, months).amount)}</b>:</p>
+    ${hasWompi ? `<div class="seg" id="q-method" style="margin-bottom:10px"><button type="button" data-pm="wompi" aria-pressed="true"><i class="mdi mdi-credit-card-check-outline"></i> Wompi</button><button type="button" data-pm="manual" aria-pressed="false">Transferencia</button></div>` : ''}
+    <div id="pm-wompi" ${hasWompi ? '' : 'hidden'}>
+      <div class="pay-box" style="white-space:normal">Paga con <b>Nequi, PSE, tarjeta o Bancolombia</b> en Wompi. Escribe exactamente <b class="q-amt">${cop(quote(plan, months).amount)}</b> si Wompi te pide el valor. Al terminar, vuelve aquí: tu plan se activa solo.</div>
+      <a class="btn" id="q-wompi" href="${esc(st.wompi_link_url || '#')}" target="_blank" rel="noopener" style="text-decoration:none;background:#0B1B4D"><i class="mdi mdi-open-in-new"></i>Pagar <span class="q-amt">${cop(quote(plan, months).amount)}</span> con Wompi</a>
+      <label class="lbl" for="q-tx" style="margin-top:14px">¿Ya pagaste? Pega el número de la transacción</label>
+      <div class="field"><input id="q-tx" maxlength="80" autocomplete="off" placeholder="Ej: 123456-1728650000-12345" value="${esc(pre.tx || '')}"></div>
+      <p style="font-size:12.5px;margin:6px 2px 0">Está en el comprobante de Wompi y también te llega al correo. Verificamos tu pago directamente con Wompi; cada pago solo se puede usar una vez.</p>
+    </div>
+    <div id="pm-manual" ${hasWompi ? 'hidden' : ''}>
+      <div class="pay-box">${esc(st.pay_instructions || 'El administrador aún no ha configurado los datos de pago.')}</div>
+      <label class="lbl" for="q-ref">Número o referencia del pago</label><div class="field"><input id="q-ref" maxlength="120" placeholder="Ej: M1234567 o comprobante Nequi"></div>
+      <p style="font-size:12.5px;margin:6px 2px 0">El administrador revisa tu pago y activa el plan.</p>
+    </div>
     <div id="q-msg" hidden style="margin-top:10px"></div>
-    <div class="row2" style="margin-top:16px"><button type="button" class="btn outline" id="q-cancel">Cancelar</button><button class="btn" id="q-send">Enviar solicitud</button></div>
+    <div class="row2" style="margin-top:16px"><button type="button" class="btn outline" id="q-cancel">Cancelar</button><button class="btn" id="q-send">${hasWompi ? 'Confirmar mi pago' : 'Enviar solicitud'}</button></div>
   </form></div>`;
+  const total = () => quote(plan, months).amount;
+  const company = () => plan === 'empresa' ? $('#q-company').value.trim() : null;
+  const nit = () => plan === 'empresa' ? ($('#q-nit').value.trim() || null) : null;
   $('#q-cancel').onclick = () => { root.innerHTML = ''; };
   $('#q-months').addEventListener('click', e => {
     const b = e.target.closest('[data-m]'); if (!b) return;
     months = +b.dataset.m;
     $$('#q-months .mopt').forEach(x => x.setAttribute('aria-pressed', x === b));
-    $('#q-total').textContent = cop(quote(plan, months).amount);
+    $('#q-total').textContent = cop(total());
+    $$('.q-amt', root).forEach(x => { x.textContent = cop(total()); });
   });
-  $('#req-form').addEventListener('submit', async e => {
-    e.preventDefault();
+  if (hasWompi) {
+    $('#q-method').addEventListener('click', e => {
+      const b = e.target.closest('[data-pm]'); if (!b) return;
+      method = b.dataset.pm;
+      $$('#q-method button').forEach(x => x.setAttribute('aria-pressed', x === b));
+      $('#pm-wompi').hidden = method !== 'wompi'; $('#pm-manual').hidden = method !== 'manual';
+      $('#q-send').textContent = method === 'wompi' ? 'Confirmar mi pago' : 'Enviar solicitud';
+      msg($('#q-msg'), '');
+    });
+    $('#q-wompi').addEventListener('click', e => {
+      if (plan === 'empresa' && company().length < 2) { e.preventDefault(); return msg($('#q-msg'), 'Escribe primero el nombre de la empresa.'); }
+      savePending({ plan, months, company: company(), nit: nit(), phone: $('#q-phone').value.trim() });
+      setTimeout(() => { const t = $('#q-tx'); if (t) t.focus(); }, 400);
+    });
+  }
+  const send = async () => {
     const m = $('#q-msg');
-    const phone = $('#q-phone').value.trim(), ref = $('#q-ref').value.trim();
-    const company = plan === 'empresa' ? $('#q-company').value.trim() : null;
-    if (plan === 'empresa' && company.length < 2) return msg(m, 'Escribe el nombre de la empresa.');
+    const phone = $('#q-phone').value.trim();
+    if (plan === 'empresa' && company().length < 2) return msg(m, 'Escribe el nombre de la empresa.');
+    if (method === 'wompi') {
+      const tx = $('#q-tx').value.trim();
+      if (!TX_RE.test(tx)) return msg(m, tx ? 'Ese número de transacción no es válido. Cópialo tal como aparece en el comprobante de Wompi.' : 'Primero paga con Wompi y luego pega aquí el número de la transacción.');
+      const btn = $('#q-send'); busy(btn, true); msg(m, 'Verificando tu pago con Wompi…', true);
+      const { data, error } = await sb.rpc('claim_wompi_plan', { p_plan: plan, p_months: months, p_tx_id: tx, p_company: company(), p_nit: nit(), p_phone: phone || null });
+      busy(btn, false, 'Confirmar mi pago');
+      if (error) return msg(m, /claim_wompi_plan|could not find/i.test(error.message || '') ? 'El pago con Wompi aún no está activado. Usa la opción Transferencia o avísale al administrador.' : friendly(error));
+      clearPending();
+      if (data && data.request_id) sb.functions.invoke('notify-admin', { body: { request_id: data.request_id } }).catch(() => {});
+      if (data && data.status === 'approved') {
+        root.innerHTML = '';
+        toast(data.message || '¡Pago confirmado! Tu plan ya está activo.');
+        beep(); await loadPlan(); setTab('perfil');
+      } else {
+        msg(m, (data && data.message) || 'Recibimos tu pago. Lo revisamos y activamos tu plan en breve.', true);
+        setTimeout(() => { root.innerHTML = ''; loadPlan(); }, 2500);
+      }
+      return;
+    }
+    const ref = $('#q-ref').value.trim();
     if (phone.length < 7) return msg(m, 'Escribe un celular de contacto.');
     if (ref.length < 3) return msg(m, 'Escribe la referencia del pago para que podamos confirmarlo.');
     const btn = $('#q-send'); busy(btn, true);
-    const row = { plan, months, company_name: company, nit: plan === 'empresa' ? ($('#q-nit').value.trim() || null) : null, contact_phone: phone, payment_ref: ref };
+    const row = { plan, months, company_name: company(), nit: nit(), contact_phone: phone, payment_ref: ref };
     let { data: created, error } = await sb.from('plan_requests').insert(row).select('id').single();
     if (error && /months/i.test(error.message || '')) { delete row.months; ({ data: created, error } = await sb.from('plan_requests').insert(row).select('id').single()); } // base sin finanzas.sql
     // Aviso al administrador por WhatsApp y correo (no bloquea al usuario si falla)
@@ -1580,7 +1636,27 @@ function requestPlan(plan) {
     root.innerHTML = '';
     toast('Solicitud enviada. Te avisaremos cuando se active tu plan.');
     loadPlan();
-  });
+  };
+  $('#req-form').addEventListener('submit', e => { e.preventDefault(); send(); });
+  if (pre.tx && pre.auto) send();
+}
+// Regreso desde Wompi: la URL trae ?id=<transacción>
+const wompiReturnTx = (() => {
+  try {
+    const q = new URLSearchParams(location.search);
+    const id = q.get('id');
+    if (id && TX_RE.test(id)) { history.replaceState(null, '', location.pathname + location.hash); return id; }
+  } catch (_) {}
+  return null;
+})();
+let wompiResumed = false;
+function resumeWompi() {
+  if (wompiResumed || !wompiReturnTx) return;
+  wompiResumed = true;
+  const p = readPending();
+  if (!p) { toast('Volviste de Wompi. Abre Perfil → Planes y pega el número de tu transacción para activar el plan.'); return; }
+  setTab('planes');
+  requestPlan(p.plan, { ...p, tx: wompiReturnTx, auto: true });
 }
 // ----- Mi empresa (dueño) -----
 async function renderCompany() {
@@ -1710,7 +1786,8 @@ async function admPlanes(body) {
   const income = active.reduce((a, x) => a + (x.kind === 'plus' ? set.plus_price : set.empresa_price), 0);
   const $b = $('#adm-planes-btn'); if ($b) $b.textContent = pend.length ? `Planes (${pend.length})` : 'Planes';
   const reqRow = r => `<div class="arow"><span class="pchip ${r.plan}" style="flex:none;margin-top:2px">${PLAN_NAMES[r.plan]}</span><div class="info">
-      <div class="t">${esc(r.plan === 'empresa' ? (r.company_name || 'Empresa') : (r.full_name || r.email))}</div>
+      <div class="t">${esc(r.plan === 'empresa' ? (r.company_name || 'Empresa') : (r.full_name || r.email))}${r.wompi_tx ? ' <span class="tag on">Wompi</span>' : ''}</div>
+      ${r.wompi_tx && r.status === 'pendiente' ? '<div class="m" style="color:#92400E">Wompi lo aprobó, pero no entró por tu link actual. Revisa en tu panel de Wompi antes de aprobar.</div>' : ''}
       <div class="s">${esc(r.email)}${r.contact_phone ? ' · ' + esc(r.contact_phone) : ''}${r.nit ? ' · NIT ' + esc(r.nit) : ''}</div>
       <div class="m">${r.months ? `<b>${r.months} ${r.months == 1 ? 'mes' : 'meses'}</b>${r.amount != null ? ' · <b>' + cop(r.amount) + '</b>' : ''} · ` : ''}Pago: <b>${esc(r.payment_ref || '—')}</b> · ${timeAgo(r.created_at).toLowerCase()}${r.status !== 'pendiente' ? ' · ' + (r.status === 'aprobada' ? '✅ aprobada' : '❌ rechazada') : ''}</div>
       ${r.status === 'pendiente' ? `<div class="acts"><select id="m-${r.id}" aria-label="Meses">${MONTH_OPTS.map(n => `<option value="${n}" ${n === (r.months || 1) ? 'selected' : ''}>${n} ${n === 1 ? 'mes' : 'meses'}</option>`).join('')}</select>
@@ -1747,6 +1824,8 @@ async function admPlanes(body) {
         <div class="full"><label class="lbl" for="s-bn" style="font-size:13px;font-weight:700;color:var(--navy)">Empresa que emite los recibos</label><div class="field"><input id="s-bn" maxlength="120" value="${esc(set.biz_name || '')}"></div></div>
         <div><label class="lbl" for="s-bnit" style="font-size:13px;font-weight:700;color:var(--navy)">NIT</label><div class="field"><input id="s-bnit" maxlength="30" value="${esc(set.biz_nit || '')}"></div></div>
         <div><label class="lbl" for="s-bcity" style="font-size:13px;font-weight:700;color:var(--navy)">Ciudad</label><div class="field"><input id="s-bcity" maxlength="60" value="${esc(set.biz_city || '')}"></div></div>` : ''}
+        ${'wompi_link_url' in set ? `<div class="full"><label class="lbl" for="s-wl" style="font-size:13px;font-weight:700;color:var(--navy)">Link de pago de Wompi</label><div class="field"><input id="s-wl" maxlength="200" value="${esc(set.wompi_link_url || '')}" placeholder="https://checkout.wompi.co/l/XXXXXX"></div>
+          <p style="font-size:12px;color:var(--muted);margin:6px 2px 0">Los pagos que entren por este link activan el plan solos. Déjalo vacío para cobrar solo por transferencia.</p></div>` : ''}
         <div class="full"><label class="lbl" for="s-pay" style="font-size:13px;font-weight:700;color:var(--navy)">Instrucciones de pago (las ve el usuario)</label>
           <textarea class="ta" id="s-pay" maxlength="800" placeholder="Ej: Nequi 300 123 4567 a nombre de Orion Nova Technologies. Bancolombia ahorros 123-456789-00.">${esc(set.pay_instructions || '')}</textarea></div>
       </div>
@@ -1779,6 +1858,12 @@ async function admPlanes(body) {
     e.preventDefault();
     const upd = { plus_price: Math.max(0, +$('#s-plus').value || 0), empresa_price: Math.max(0, +$('#s-emp').value || 0),
       empresa_seats: Math.min(500, Math.max(1, +$('#s-seats').value || 10)), pay_instructions: $('#s-pay').value.trim(), updated_at: new Date().toISOString() };
+    if ($('#s-wl')) {
+      const wl = $('#s-wl').value.trim();
+      const mm = wl.match(/\/l\/([A-Za-z0-9_-]+)/);
+      if (wl && !mm) return toast('El link de Wompi debe verse así: https://checkout.wompi.co/l/XXXXXX');
+      Object.assign(upd, { wompi_link_url: wl, wompi_link_id: mm ? mm[1] : '' });
+    }
     if ($('#s-d3')) {
       const pct = id => Math.min(90, Math.max(0, Math.round(+$(id).value || 0)));
       Object.assign(upd, { disc_3: pct('#s-d3'), disc_6: pct('#s-d6'), disc_12: pct('#s-d12'),
