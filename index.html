@@ -618,6 +618,7 @@ table.fin tfoot td{font-weight:800;border-bottom:0}
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="orion-supabase.js"></script>
 <script>
 (function () {
 'use strict';
@@ -625,6 +626,19 @@ table.fin tfoot td{font-weight:800;border-bottom:0}
 // ===== Configuración: proyecto Supabase "Alerta Transito" (separado de Nova) =====
 const SUPABASE_URL = 'https://hgwzuhizruwsdbditsai.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnd3p1aGl6cnV3c2RiZGl0c2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTM2NTIsImV4cCI6MjEwNzEyOTY1Mn0.QDPKrTzyT1zXkse821iror6YfEv74yqGeh1z3C-pklU'; // clave pública (anon); la seguridad la dan las políticas RLS
+// ===== Servidor propio: ORION NOVA CLOUD (máquina virtual de Orion Nova) =====
+const ORION_API_URL = 'https://api-alerta.orionnovatechnologies.com';
+// Servidor que usan todos: 'supabase' o 'orion'.
+// Para probar sin afectar a nadie abre la app con ?servidor=orion (y ?servidor=supabase para volver).
+const SERVIDOR_PREDETERMINADO = 'supabase';
+const SERVIDOR = (() => {
+  try {
+    const q = new URLSearchParams(location.search).get('servidor');
+    if (q === 'orion' || q === 'supabase') localStorage.setItem('at_servidor', q);
+    const v = localStorage.getItem('at_servidor');
+    return v === 'orion' || v === 'supabase' ? v : SERVIDOR_PREDETERMINADO;
+  } catch (e) { return SERVIDOR_PREDETERMINADO; }
+})();
 const DEFAULT_CENTER = [4.6533, -74.0836]; // Bogotá
 const NEAR_KM_FREE = 5, NEAR_KM_PLUS = 20;
 const DRIVE_M = 500; // distancia de aviso en modo conducción
@@ -647,13 +661,22 @@ const T = Object.fromEntries(TYPES.map(t => [t.key, t]));
 const AGENT_TYPES = ['agente', 'reten_transito', 'reten_policia', 'control'];
 const ZONE_KM = 1;
 
-if (!window.supabase || !window.L) {
+if (!window.L || (SERVIDOR === 'orion' ? !window.orionSupabase : !window.supabase)) {
   document.body.innerHTML = '<div style="padding:32px 20px;font-family:system-ui;text-align:center;color:#0B1B4D"><h2>No se pudo cargar Alerta Tránsito</h2><p>Revisa tu conexión a internet y recarga la página.</p><button onclick="location.reload()" style="margin-top:12px;padding:12px 20px;border-radius:10px;border:0;background:#1E5EFF;color:#fff;font-weight:700">Recargar</button></div>';
   return;
 }
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
-});
+const sb = SERVIDOR === 'orion'
+  ? window.orionSupabase.createClient(ORION_API_URL)
+  : window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+  });
+if (SERVIDOR !== SERVIDOR_PREDETERMINADO) {  // aviso visible solo en modo de prueba
+  const tag = document.createElement('div');
+  tag.textContent = SERVIDOR === 'orion' ? 'Servidor ORION (prueba)' : 'Servidor Supabase (prueba)';
+  tag.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;padding:4px 8px;border-radius:8px;background:#0B1B4D;color:#fff;font:600 11px system-ui;opacity:.85;pointer-events:none';
+  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(tag));
+  if (document.body) document.body.appendChild(tag);
+}
 
 const S = {
   session: null, reports: [], filter: 'todos', me: null, tab: 'mapa', type: 'foto_multa',
