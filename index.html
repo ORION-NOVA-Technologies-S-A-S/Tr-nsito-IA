@@ -628,9 +628,9 @@ const SUPABASE_URL = 'https://hgwzuhizruwsdbditsai.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnd3p1aGl6cnV3c2RiZGl0c2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTM2NTIsImV4cCI6MjEwNzEyOTY1Mn0.QDPKrTzyT1zXkse821iror6YfEv74yqGeh1z3C-pklU'; // clave pública (anon); la seguridad la dan las políticas RLS
 // ===== Servidor propio: ORION NOVA CLOUD (máquina virtual de Orion Nova) =====
 const ORION_API_URL = 'https://api-alerta.orionnovatechnologies.com';
-// Servidor que usan todos: 'supabase' o 'orion'.
+// Servidor que usan todos: 'orion' (servidor propio) o 'supabase' (respaldo).
 // Para probar sin afectar a nadie abre la app con ?servidor=orion (y ?servidor=supabase para volver).
-const SERVIDOR_PREDETERMINADO = 'supabase';
+const SERVIDOR_PREDETERMINADO = 'orion';
 const SERVIDOR = (() => {
   try {
     const q = new URLSearchParams(location.search).get('servidor');
